@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - Security Lab</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="login.html">Giriş</a></li>
+                <li><a href="register.html">Kayıt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h1>🔑 Giriş Yap</h1>
+            <p style="color: #6b7280; margin-bottom: 1.5rem;">Hesabınıza giriş yapın</p>
+
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-posta</label>
+                    <input type="email" id="email" name="email" placeholder="ornek@email.com" required>
+                    <!-- Vulnerable: No input sanitization -->
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" name="password" placeholder="********" required>
+                    <!-- Vulnerable: No password complexity requirements -->
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="remember"> Beni Hatırla
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="forgot-password.html" style="color: var(--primary-color);">Şifremi Unuttum</a>
+                </div>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    Hesabınız yok mu? <a href="register.html" style="color: var(--primary-color);">Kayıt Ol</a>
+                </div>
+            </form>
+
+            <!-- Vulnerable: Rate limiting information exposed -->
+            <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 5px; font-size: 0.875rem;">
+                <strong>⚠️ Test Hesapları:</strong><br>
+                <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e5f5a5357507e4a5b4d4a105d5153">[email&#160;protected]</a> / Admin123!</code><br>
+                <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5e2b2d3b2c1e2a3b2d2a703d3133">[email&#160;protected]</a> / User123!</code><br>
+                <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9eeafbedeadeeafbedeab0fdf1f3">[email&#160;protected]</a> / Test123!</code>
+            </div>
+
+            <!-- Vulnerable Scenarios -->
+            <div style="margin-top: 2rem; padding: 1rem; background: #fee2e2; border-radius: 5px;">
+                <h3 style="color: #991b1b;">🎯 Test Senaryoları</h3>
+                <ul style="margin-left: 1.5rem; color: #991b1b;">
+                    <li>SQL Injection: ' OR '1'='1</li>
+                    <li>XSS: &lt;script&gt;alert('XSS')&lt;/script&gt;</li>
+                    <li>Brute Force: Rate limiting yok</li>
+                    <li>Credential Stuffing: CAPTCHA yok</li>
+                    <li>Session Fixation mümkün</li>
+                    <li>Username Enumeration: Farklı hata mesajları</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Login Attempts Counter (Vulnerable to brute force) -->
+        <div class="stats-section" style="margin-top: 2rem;">
+            <h3>📊 Giriş Denemeleri</h3>
+            <p>Bu IP'den yapılan toplam deneme: <strong id="attempt-count">0</strong></p>
+            <p>Başarısız denemeler: <strong id="failed-count">0</strong></p>
+            <p style="color: #6b7280; font-size: 0.875rem;">Not: Rate limiting aktif değil</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>🔓 Deliberately Vulnerable Application</p>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/auth.js"></script>
+    <script>
+        // Vulnerable: Hardcoded credentials in JavaScript
+        const VALID_USERS = {
+            'admin@test.com': { password: 'Admin123!', role: 'admin', id: 1 },
+            'user@test.com': { password: 'User123!', role: 'user', id: 2 },
+            'test@test.com': { password: 'Test123!', role: 'user', id: 3 }
+        };
+
+        // Vulnerable: No rate limiting
+        let attemptCount = parseInt(localStorage.getItem('loginAttempts') || '0');
+        let failedCount = parseInt(localStorage.getItem('failedLogins') || '0');
+
+        document.getElementById('attempt-count').textContent = attemptCount;
+        document.getElementById('failed-count').textContent = failedCount;
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            attemptCount++;
+            localStorage.setItem('loginAttempts', attemptCount);
+            document.getElementById('attempt-count').textContent = attemptCount;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Vulnerable: SQL Injection simulation
+            console.log('SQL Query: SELECT * FROM users WHERE email = "' + email + '" AND password = "' + password + '"');
+
+            // Vulnerable: Username enumeration through different error messages
+            if (!VALID_USERS[email]) {
+                showError('Bu e-posta adresi kayıtlı değil.');
+                failedCount++;
+                localStorage.setItem('failedLogins', failedCount);
+                document.getElementById('failed-count').textContent = failedCount;
+                
+                // Vulnerable: Timing attack possible
+                setTimeout(() => {}, 100);
+                return;
+            }
+
+            if (VALID_USERS[email].password !== password) {
+                showError('Şifre yanlış. Kalan deneme hakkınız: ∞');
+                failedCount++;
+                localStorage.setItem('failedLogins', failedCount);
+                document.getElementById('failed-count').textContent = failedCount;
+                
+                // Vulnerable: Account lockout not implemented
+                return;
+            }
+
+            // Vulnerable: Insecure session management
+            const sessionToken = btoa(email + ':' + Date.now()); // Predictable token
+            localStorage.setItem('sessionToken', sessionToken);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userRole', VALID_USERS[email].role);
+            localStorage.setItem('userId', VALID_USERS[email].id);
+
+            showSuccess('Giriş başarılı! Yönlendiriliyorsunuz...');
+
+            // Vulnerable: No secure session handling
+            setTimeout(() => {
+                if (VALID_USERS[email].role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'profile.html';
+                }
+            }, 1000);
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 

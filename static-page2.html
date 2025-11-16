@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Page 2 - No JavaScript</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- No JavaScript - Pure HTML/CSS Testing -->
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="static-page1.html">Static 1</a></li>
+                <li><a href="static-page2.html">Static 2</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>📄 Static Page 2 - HTML-Only Zone</h1>
+            <p class="subtitle">Server-Side Vulnerabilities | Form Security | CSRF</p>
+        </div>
+
+        <div class="warning-box">
+            <h2>⚠️ JavaScript-Free Environment</h2>
+            <p>Bu sayfa tamamen HTML ve CSS ile çalışır. Client-side korumaları bypass etmek için idealdir.</p>
+        </div>
+
+        <!-- CSRF Vulnerable Form -->
+        <div class="form-container">
+            <h2>💳 Vulnerable Payment Form</h2>
+            <p style="color: #dc2626; font-weight: bold;">⚠️ CSRF Token YOK!</p>
+            
+            <form action="/api/transfer-money" method="POST">
+                <div class="form-group">
+                    <label for="recipient">Alıcı Hesap:</label>
+                    <input type="text" id="recipient" name="recipient" placeholder="TR000000000000000000000000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Tutar (TL):</label>
+                    <input type="number" id="amount" name="amount" placeholder="0.00" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Açıklama:</label>
+                    <input type="text" id="description" name="description" placeholder="İsteğe bağlı">
+                </div>
+
+                <!-- NO CSRF TOKEN! -->
+                <input type="hidden" name="from_account" value="TR123456789012345678901234">
+                
+                <button type="submit" class="btn btn-danger btn-block">Para Transfer Et</button>
+            </form>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #fee2e2; border-radius: 5px;">
+                <h3 style="color: #991b1b;">🎯 CSRF Attack Scenario:</h3>
+                <p style="color: #991b1b;">Saldırgan bu formu kendi sitesine koyabilir:</p>
+                <div class="code-block">
+&lt;form action="https://securelab.com/api/transfer-money" method="POST"&gt;
+  &lt;input type="hidden" name="recipient" value="ATTACKER_ACCOUNT"&gt;
+  &lt;input type="hidden" name="amount" value="9999.99"&gt;
+  &lt;input type="hidden" name="from_account" value="VICTIM_ACCOUNT"&gt;
+&lt;/form&gt;
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;
+                </div>
+            </div>
+        </div>
+
+        <!-- Autocomplete Vulnerability -->
+        <div class="form-container" style="margin-top: 2rem;">
+            <h2>🔐 Password Change (Insecure)</h2>
+            <form action="/api/change-password" method="POST" autocomplete="on">
+                <div class="form-group">
+                    <label for="current_password">Mevcut Şifre:</label>
+                    <!-- Vulnerable: autocomplete enabled on password field -->
+                    <input type="password" id="current_password" name="current_password" autocomplete="current-password">
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password">Yeni Şifre:</label>
+                    <input type="password" id="new_password" name="new_password" autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Yeni Şifre (Tekrar):</label>
+                    <input type="password" id="confirm_password" name="confirm_password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Şifreyi Değiştir</button>
+            </form>
+            <p style="margin-top: 1rem; color: #dc2626;">⚠️ autocomplete="on" - Tarayıcı şifreleri kaydedebilir!</p>
+        </div>
+
+        <!-- File Upload (No JS Validation) -->
+        <div class="form-container" style="margin-top: 2rem;">
+            <h2>📁 File Upload - No Validation</h2>
+            <form action="/api/upload" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Dosya Seç:</label>
+                    <input type="file" id="file" name="file">
+                    <!-- Vulnerable: No file type restriction, no size limit -->
+                </div>
+
+                <div class="form-group">
+                    <label for="filename">Dosya Adı (Opsiyonel):</label>
+                    <input type="text" id="filename" name="filename" placeholder="custom-name.txt">
+                    <!-- Vulnerable: Path traversal possible: ../../../etc/passwd -->
+                </div>
+
+                <button type="submit" class="btn btn-primary">Yükle</button>
+            </form>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #fee2e2; border-radius: 5px;">
+                <h3 style="color: #991b1b;">🎯 Upload Vulnerabilities:</h3>
+                <ul style="margin-left: 1.5rem; color: #991b1b;">
+                    <li>No file type validation (client or server)</li>
+                    <li>No file size limit</li>
+                    <li>No malware scanning</li>
+                    <li>Path traversal in filename: <code>../../evil.php</code></li>
+                    <li>Double extension: <code>shell.php.jpg</code></li>
+                    <li>Null byte injection: <code>shell.php%00.jpg</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- HTTP Parameter Pollution -->
+        <div class="category-card" style="margin-top: 2rem;">
+            <h2>🔀 HTTP Parameter Pollution</h2>
+            <p>Birden fazla aynı parametreyle form submission:</p>
+            <form action="/api/update-settings" method="GET">
+                <input type="hidden" name="admin" value="false">
+                <input type="hidden" name="admin" value="true">
+                <input type="hidden" name="role" value="user">
+                <input type="hidden" name="role" value="admin">
+                <button type="submit" class="btn btn-warning">Test HPP</button>
+            </form>
+            <p style="margin-top: 1rem; color: #6b7280;">
+                Sunucu hangi "admin" değerini kullanacak? İlk mi, son mu, ikisi de mi?
+            </p>
+        </div>
+
+        <!-- HTML Injection in Form -->
+        <div class="form-container" style="margin-top: 2rem;">
+            <h2>💬 Comment Section (HTML Injection)</h2>
+            <form action="/api/comment" method="POST">
+                <div class="form-group">
+                    <label for="comment">Yorumunuz:</label>
+                    <textarea id="comment" name="comment" rows="4" placeholder="Yorumunuzu buraya yazın..."></textarea>
+                    <!-- Vulnerable: No HTML entity encoding -->
+                </div>
+
+                <button type="submit" class="btn btn-primary">Yorum Yap</button>
+            </form>
+
+            <div class="code-block" style="margin-top: 1rem;">
+                Test payloads:<br>
+                &lt;h1&gt;HTML Injection&lt;/h1&gt;<br>
+                &lt;img src=x onerror=alert('XSS')&gt;<br>
+                &lt;iframe src="http://evil.com"&gt;&lt;/iframe&gt;<br>
+                &lt;a href="javascript:alert(1)"&gt;Click&lt;/a&gt;
+            </div>
+        </div>
+
+        <!-- Reflected Input (No Sanitization) -->
+        <div class="category-card" style="margin-top: 2rem;">
+            <h2>🔍 Search Function - Reflected XSS</h2>
+            <form action="/search" method="GET">
+                <div class="form-group">
+                    <input type="text" name="q" placeholder="Ara..." style="width: 70%; display: inline-block;">
+                    <button type="submit" class="btn btn-primary" style="width: 25%; display: inline-block;">Ara</button>
+                </div>
+            </form>
+            <p style="color: #6b7280;">Arama sonucu: "<span style="color: #2563eb; font-weight: bold;">USER_INPUT_REFLECTED_HERE</span>"</p>
+            <p style="color: #dc2626;">⚠️ User input reflected without sanitization!</p>
+        </div>
+
+        <!-- Sensitive Data in Source -->
+        <div class="category-card">
+            <h2>🔐 Hidden Credentials</h2>
+            <p>HTML kaynağında gizli bilgiler:</p>
+            <div class="code-block">
+                &lt;!-- View page source to find hidden data --&gt;
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden data in comments -->
+    <!--
+        API ENDPOINTS:
+        - https://api.securelab.com/v1/users
+        - https://api.securelab.com/v1/admin
+        - https://internal-api.securelab.local/debug
+        
+        CREDENTIALS:
+        - Database: postgres://dbadmin:SecurePass123@db.local:5432/production
+        - Redis: redis://:RedisPass456@cache.local:6379
+        - Admin Panel: https://admin.securelab.com (admin / AdminSecure789)
+        
+        S3 BUCKETS:
+        - s3://securelab-uploads (public-read)
+        - s3://securelab-backups (public-read)
+        - s3://securelab-logs (public-read)
+        
+        INTERNAL IPS:
+        - 10.0.1.10 - Database Server
+        - 10.0.1.20 - Redis Cache
+        - 10.0.1.30 - Admin Server
+        - 192.168.100.50 - Development Server
+    -->
+
+    <footer>
+        <p>🔓 Pure HTML/CSS - Zero JavaScript Protection</p>
+        <p>CSRF Protection: DISABLED | Input Validation: CLIENT-SIDE ONLY</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Security Lab</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="login.html">Giriş</a></li>
+                <li><a href="register.html">Kayıt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h1>📝 Yeni Hesap Oluştur</h1>
+            <p style="color: #6b7280; margin-bottom: 1.5rem;">Ücretsiz hesap oluşturun</p>
+
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="email">E-posta</label>
+                    <input type="email" id="email" name="email" placeholder="ornek@email.com" required>
+                    <span id="emailCheck" style="font-size: 0.875rem;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" name="password" placeholder="********" required>
+                    <!-- Vulnerable: No password strength requirement -->
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Şifre (Tekrar)</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="********" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Telefon Numarası</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+90 555 123 4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="referral">Referans Kodu (Opsiyonel)</label>
+                    <input type="text" id="referral" name="referral" placeholder="REF123">
+                </div>
+
+                <!-- Hidden field that can be manipulated -->
+                <input type="hidden" name="role" value="user" id="roleField">
+                <input type="hidden" name="account_type" value="free">
+
+                <button type="submit" class="btn btn-primary btn-block">Kayıt Ol</button>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    Zaten hesabınız var mı? <a href="login.html" style="color: var(--primary-color);">Giriş Yap</a>
+                </div>
+            </form>
+
+            <!-- Vulnerability Info -->
+            <div style="margin-top: 2rem; padding: 1rem; background: #fee2e2; border-radius: 5px;">
+                <h3 style="color: #991b1b;">🎯 Test Senaryoları:</h3>
+                <ul style="margin-left: 1.5rem; color: #991b1b;">
+                    <li><strong>Account Enumeration:</strong> E-posta kontrolü farklı response döner</li>
+                    <li><strong>Weak Password Policy:</strong> "123456" gibi zayıf şifreler kabul edilir</li>
+                    <li><strong>Mass Assignment:</strong> role hidden field'ını "admin"e çevir</li>
+                    <li><strong>No CAPTCHA:</strong> Otomatik kayıt mümkün</li>
+                    <li><strong>No Email Verification:</strong> E-posta doğrulama yok</li>
+                    <li><strong>Rate Limiting:</strong> Sınırsız kayıt denemesi</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Registration Stats -->
+        <div class="stats-section" style="margin-top: 2rem;">
+            <h3>📊 Kayıt İstatistikleri</h3>
+            <p>Bugün kayıt olan: <strong>237</strong></p>
+            <p>Bu IP'den kayıt: <strong id="registrationCount">0</strong></p>
+            <p style="color: #6b7280; font-size: 0.875rem;">⚠️ Rate limiting yok</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>🔓 Deliberately Vulnerable Registration</p>
+    </footer>
+
+    <script>
+        let registrationCount = parseInt(localStorage.getItem('registrationCount') || '0');
+        document.getElementById('registrationCount').textContent = registrationCount;
+
+        // Vulnerable: Email enumeration - different responses
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailCheck = document.getElementById('emailCheck');
+            
+            // Vulnerable: Tells attacker if email exists
+            const existingEmails = ['admin@test.com', 'user@test.com', 'test@test.com'];
+            
+            if (existingEmails.includes(email)) {
+                emailCheck.textContent = '❌ Bu e-posta zaten kullanılıyor';
+                emailCheck.style.color = '#dc2626';
+            } else {
+                emailCheck.textContent = '✅ E-posta uygun';
+                emailCheck.style.color = '#10b981';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            registrationCount++;
+            localStorage.setItem('registrationCount', registrationCount);
+            document.getElementById('registrationCount').textContent = registrationCount;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const phone = document.getElementById('phone').value;
+            const role = document.getElementById('roleField').value;
+
+            // Vulnerable: Weak validation
+            if (password !== confirmPassword) {
+                showError('Şifreler eşleşmiyor');
+                return;
+            }
+
+            // Vulnerable: No password strength check
+            if (password.length < 3) {
+                showError('Şifre çok kısa (min 3 karakter)');
+                return;
+            }
+
+            // Vulnerable: Mass assignment possible
+            const userData = {
+                email: email,
+                password: password, // Stored in plain text in localStorage!
+                phone: phone,
+                role: role, // User can modify this!
+                createdAt: new Date().toISOString(),
+                verified: false,
+                id: Math.floor(Math.random() * 10000)
+            };
+
+            // Vulnerable: Storing in localStorage without encryption
+            localStorage.setItem('newUser', JSON.stringify(userData));
+
+            console.log('New user registered:', userData);
+
+            showSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
+
+            // Check if user manipulated role to admin
+            if (role === 'admin') {
+                alert('🚨 PRIVILEGE ESCALATION SUCCESSFUL! Role set to admin!');
+            }
+
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        // Vulnerable: Exposing user check endpoint
+        console.log('User check endpoint: /api/check-email?email=USER_EMAIL');
+        console.log('Registration endpoint: POST /api/register');
+        console.log('Tip: Modify the role hidden field to "admin" before submitting!');
+    </script>
+</body>
+</html>

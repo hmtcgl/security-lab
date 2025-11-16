@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Testing Lab - Ana Sayfa</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="login.html">Giriş</a></li>
+                <li><a href="register.html">Kayıt</a></li>
+                <li><a href="payment.html">Ödeme</a></li>
+                <li><a href="profile.html">Profil</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="hero">
+            <h1>🎯 Comprehensive Security Testing Laboratory</h1>
+            <p class="subtitle">OWASP Top 10 | LLM Top 10 | Automated Threats | API Security</p>
+        </header>
+
+        <section class="warning-box">
+            <h2>⚠️ UYARI</h2>
+            <p>Bu site <strong>kasıtlı olarak güvenlik açıkları içermektedir</strong>. Sadece eğitim ve güvenlik testi amaçlıdır.</p>
+        </section>
+
+        <div class="test-categories">
+            <div class="category-card">
+                <h2>💳 Payment Security (PCI DSS)</h2>
+                <ul>
+                    <li><a href="payment.html">Payment Form (PCI DSS Violations)</a></li>
+                    <li><a href="payment.html">CVV Storage (Insecure)</a></li>
+                    <li><a href="payment.html">Card Number Logging</a></li>
+                    <li><a href="payment.html">No 3D Secure</a></li>
+                    <li><a href="payment.html">CVV Brute Force</a></li>
+                    <li><a href="payment.html">Card Testing (Carding)</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>🌐 Multi-Language Support</h2>
+                <p>Site dili değiştirilebilir:</p>
+                <ul>
+                    <li>🇹🇷 Türkçe</li>
+                    <li>🇬🇧 English</li>
+                    <li>🇫🇷 Français</li>
+                    <li>🇸🇦 العربية (RTL support)</li>
+                </ul>
+                <p style="margin-top: 1rem;">Tüm sayfalar otomatik çevrilir!</p>
+            </div>
+
+            <div class="category-card">
+                <h2>🔓 OWASP Top 10 (2021)</h2>
+                <ul>
+                    <li><a href="login.html">A01: Broken Access Control</a></li>
+                    <li><a href="profile.html?user=admin">A02: Cryptographic Failures</a></li>
+                    <li><a href="search.html">A03: Injection (SQL, XSS)</a></li>
+                    <li><a href="upload.html">A04: Insecure Design</a></li>
+                    <li><a href="admin.html">A05: Security Misconfiguration</a></li>
+                    <li><a href="profile.html">A07: Authentication Failures</a></li>
+                    <li><a href="api-test.html">A08: Data Integrity Failures</a></li>
+                    <li><a href="admin.html">A09: Logging Failures</a></li>
+                    <li><a href="api-test.html">A10: SSRF</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>🤖 OWASP LLM Top 10</h2>
+                <ul>
+                    <li><a href="ai-chat.html">LLM01: Prompt Injection</a></li>
+                    <li><a href="ai-chat.html">LLM02: Insecure Output Handling</a></li>
+                    <li><a href="ai-chat.html">LLM03: Training Data Poisoning</a></li>
+                    <li><a href="ai-chat.html">LLM04: Model DoS</a></li>
+                    <li><a href="ai-chat.html">LLM06: Info Disclosure</a></li>
+                    <li><a href="ai-chat.html">LLM07: Insecure Plugin Design</a></li>
+                    <li><a href="ai-chat.html">LLM08: Excessive Agency</a></li>
+                    <li><a href="ai-chat.html">LLM09: Overreliance</a></li>
+                    <li><a href="ai-chat.html">LLM10: Model Theft</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>🤖 OWASP Automated Threats</h2>
+                <ul>
+                    <li><a href="bot-challenge.html">OAT-001: Carding</a></li>
+                    <li><a href="bot-challenge.html">OAT-005: Scalping</a></li>
+                    <li><a href="bot-challenge.html">OAT-007: Credential Cracking</a></li>
+                    <li><a href="bot-challenge.html">OAT-008: Credential Stuffing</a></li>
+                    <li><a href="bot-challenge.html">OAT-011: Scraping</a></li>
+                    <li><a href="bot-challenge.html">OAT-013: Sniping</a></li>
+                    <li><a href="bot-challenge.html">OAT-015: Denial of Service</a></li>
+                    <li><a href="bot-challenge.html">OAT-020: Account Aggregation</a></li>
+                    <li><a href="bot-challenge.html">OAT-021: Denial of Inventory</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>🔑 Account Takeover Tests</h2>
+                <ul>
+                    <li><a href="login.html">Brute Force Login</a></li>
+                    <li><a href="register.html">Account Enumeration</a></li>
+                    <li><a href="forgot-password.html">Password Reset Flaws</a></li>
+                    <li><a href="profile.html">Session Hijacking</a></li>
+                    <li><a href="profile.html">CSRF on Profile Update</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>🌐 API & Infrastructure</h2>
+                <ul>
+                    <li><a href="api-test.html">REST API Testing</a></li>
+                    <li><a href="api-test.html">Rate Limiting Bypass</a></li>
+                    <li><a href="api-test.html">API Authentication</a></li>
+                    <li><a href="upload.html">File Upload API</a></li>
+                    <li><a href="admin.html">Admin API Endpoints</a></li>
+                </ul>
+            </div>
+
+            <div class="category-card">
+                <h2>📄 JavaScript-Free Pages</h2>
+                <p>CSP Bypass & Client-Side Protection Testing</p>
+                <ul>
+                    <li><a href="static-page1.html">Static Page 1 (No JS)</a></li>
+                    <li><a href="static-page2.html">Static Page 2 (No JS)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <section class="stats-section">
+            <h2>📊 Site İstatistikleri</h2>
+            <div class="stats-grid">
+                <div class="stat-box" id="visitor-count">
+                    <h3>Ziyaretçi</h3>
+                    <p class="stat-number">Loading...</p>
+                </div>
+                <div class="stat-box" id="api-calls">
+                    <h3>API Çağrıları</h3>
+                    <p class="stat-number">Loading...</p>
+                </div>
+                <div class="stat-box" id="failed-logins">
+                    <h3>Başarısız Giriş</h3>
+                    <p class="stat-number">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vulnerable comment with hidden info -->
+        <!-- TODO: Remove admin credentials: admin@test.com / Admin123! -->
+        <!-- API Key: sk-test-vulnerable-key-12345 -->
+    </div>
+
+    <footer>
+        <p>🔓 Deliberately Vulnerable Application | For Educational Purposes Only</p>
+        <p>Built for OWASP Top 10, LLM Security, and Automated Threat Testing</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Vulnerable: Exposing sensitive data in client-side
+        window.CONFIG = {
+            apiUrl: '/api',
+            adminPanel: '/admin.html',
+            debugMode: true,
+            apiKey: 'exposed-api-key-in-js'
+        };
+
+        // Load statistics with vulnerable API call
+        fetch('/api/stats.json')
+            .then(r => r.json())
+            .then(data => {
+                document.querySelector('#visitor-count .stat-number').textContent = data.visitors;
+                document.querySelector('#api-calls .stat-number').textContent = data.apiCalls;
+                document.querySelector('#failed-logins .stat-number').textContent = data.failedLogins;
+            })
+            .catch(e => console.error('Stats load error:', e));
+    </script>
+</body>
+</html>

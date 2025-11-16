@@ -1,0 +1,44 @@
+[build]
+  publish = "."
+  command = "echo 'No build step required'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Deliberately misconfigured security headers for testing
+    X-Frame-Options = "ALLOWALL"  # Vulnerable to clickjacking
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "0"  # XSS protection disabled
+    Content-Security-Policy = ""  # No CSP
+    Access-Control-Allow-Origin = "*"  # CORS misconfigured
+    Access-Control-Allow-Methods = "*"
+    Access-Control-Allow-Headers = "*"
+    Server = "Apache/2.4.41 (Ubuntu)"  # Information disclosure
+    X-Powered-By = "PHP/7.4.3"  # Information disclosure
+
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# Exposed sensitive files (deliberately vulnerable)
+[[headers]]
+  for = "/.env"
+  [headers.values]
+    Content-Type = "text/plain"
+
+[[headers]]
+  for = "/.git/*"
+  [headers.values]
+    Content-Type = "text/plain"
+
+# Allow directory listing (vulnerable)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Directory-Listing = "enabled"

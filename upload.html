@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload - Security Lab</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="upload.html">Upload</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>📤 File Upload Testing</h1>
+            <p class="subtitle">Unrestricted File Upload | Path Traversal | RCE</p>
+        </div>
+
+        <div class="warning-box">
+            <h2>⚠️ Vulnerable File Upload</h2>
+            <p>Bu dosya yükleme sistemi kasıtlı olarak güvenlik açıkları içermektedir.</p>
+        </div>
+
+        <div class="test-categories">
+            <!-- Main Upload Form -->
+            <div class="category-card">
+                <h2>📁 File Upload (No Restrictions)</h2>
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="file">Dosya Seç:</label>
+                        <input type="file" id="file" name="file" multiple>
+                        <!-- Vulnerable: No file type restriction -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="filename">Özel Dosya Adı (Opsiyonel):</label>
+                        <input type="text" id="filename" name="filename" placeholder="custom-name.txt">
+                        <!-- Vulnerable: Path traversal possible -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Açıklama:</label>
+                        <textarea id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Yükle</button>
+                </form>
+
+                <div id="uploadResult" style="margin-top: 1rem;"></div>
+            </div>
+
+            <!-- Uploaded Files List -->
+            <div class="category-card">
+                <h2>📋 Yüklenen Dosyalar</h2>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Dosya Adı</th>
+                                <th>Boyut</th>
+                                <th>Tip</th>
+                                <th>Tarih</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fileList">
+                            <tr>
+                                <td>shell.php</td>
+                                <td>2.3 KB</td>
+                                <td>application/x-php</td>
+                                <td>2024-01-15 10:30</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="downloadFile('shell.php')">Download</button>
+                                    <button class="btn btn-danger" onclick="deleteFile('shell.php')">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>backdoor.jsp</td>
+                                <td>5.1 KB</td>
+                                <td>text/jsp</td>
+                                <td>2024-01-15 09:15</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="downloadFile('backdoor.jsp')">Download</button>
+                                    <button class="btn btn-danger" onclick="deleteFile('backdoor.jsp')">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>../../etc/passwd</td>
+                                <td>1.8 KB</td>
+                                <td>text/plain</td>
+                                <td>2024-01-15 08:45</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="downloadFile('../../etc/passwd')">Download</button>
+                                    <button class="btn btn-danger" onclick="deleteFile('../../etc/passwd')">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vulnerability Details -->
+            <div class="category-card">
+                <h2>🎯 Exploitation Techniques</h2>
+                <h3>1. Malicious File Upload</h3>
+                <ul>
+                    <li>Upload PHP/JSP/ASP shell: <code>shell.php</code></li>
+                    <li>Double extension bypass: <code>shell.php.jpg</code></li>
+                    <li>Null byte injection: <code>shell.php%00.jpg</code></li>
+                    <li>MIME type manipulation</li>
+                    <li>ZIP bomb upload</li>
+                </ul>
+
+                <h3>2. Path Traversal</h3>
+                <div class="code-block">
+                    Filename examples:<br>
+                    - ../../../etc/passwd<br>
+                    - ..\\..\\..\\windows\\system32\\config\\sam<br>
+                    - ../../../../var/www/html/shell.php<br>
+                    - .htaccess (overwrite web config)
+                </div>
+
+                <h3>3. Content-Type Bypass</h3>
+                <ul>
+                    <li>Change Content-Type header to allowed type</li>
+                    <li>Upload .htaccess to allow PHP execution</li>
+                    <li>Polyglot files (valid in multiple formats)</li>
+                </ul>
+
+                <h3>4. File Size Attacks</h3>
+                <ul>
+                    <li>Upload extremely large files (DoS)</li>
+                    <li>ZIP bombs</li>
+                    <li>Decompression bombs</li>
+                </ul>
+            </div>
+
+            <!-- Upload via URL -->
+            <div class="category-card">
+                <h2>🌐 Upload from URL (SSRF)</h2>
+                <p>Dosyayı URL'den yükle:</p>
+                <div class="form-group">
+                    <input type="text" id="urlInput" placeholder="http://example.com/file.pdf" style="width: 100%;">
+                    <button class="btn btn-primary" onclick="uploadFromURL()">URL'den Yükle</button>
+                </div>
+                <div id="urlResult" style="margin-top: 1rem;"></div>
+                <p style="color: #dc2626; margin-top: 1rem;">
+                    ⚠️ No URL validation! SSRF possible:<br>
+                    - http://169.254.169.254/latest/meta-data/<br>
+                    - http://localhost:8080/admin<br>
+                    - file:///etc/passwd
+                </p>
+            </div>
+
+            <!-- Image Upload (XSS via SVG) -->
+            <div class="category-card">
+                <h2>🖼️ Image Upload (SVG XSS)</h2>
+                <form id="imageForm">
+                    <div class="form-group">
+                        <input type="file" id="imageFile" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Image</button>
+                </form>
+                <div id="imagePreview" style="margin-top: 1rem;"></div>
+                <div style="margin-top: 1rem;">
+                    <p><strong>SVG XSS Payload:</strong></p>
+                    <div class="code-block">
+&lt;svg xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;script&gt;alert('XSS')&lt;/script&gt;
+&lt;/svg&gt;
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata Upload -->
+            <div class="category-card">
+                <h2>📝 File with Metadata</h2>
+                <p>Dosya metadata'sı validate edilmiyor:</p>
+                <ul>
+                    <li>EXIF data can contain XSS</li>
+                    <li>PDF metadata can execute JavaScript</li>
+                    <li>Office documents can contain macros</li>
+                    <li>ZIP archives can contain path traversal</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Upload Statistics -->
+        <div class="stats-section">
+            <h2>📊 Upload Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>Total Uploads</h3>
+                    <p class="stat-number" id="totalUploads">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Malicious Files</h3>
+                    <p class="stat-number" id="maliciousFiles">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Storage Used</h3>
+                    <p class="stat-number" id="storageUsed">0 MB</p>
+                </div>
+            </div>
+            <p style="margin-top: 1rem; color: #dc2626;">⚠️ No malware scanning | No file type validation | No size limits</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>🔓 Deliberately Vulnerable File Upload</p>
+    </footer>
+
+    <script>
+        let uploadCount = parseInt(localStorage.getItem('uploadCount') || '0');
+        let maliciousCount = parseInt(localStorage.getItem('maliciousCount') || '0');
+        let storageUsed = parseInt(localStorage.getItem('storageUsed') || '0');
+
+        updateStats();
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('file');
+            const customName = document.getElementById('filename').value;
+            const description = document.getElementById('description').value;
+
+            if (!fileInput.files.length) {
+                showUploadResult('Lütfen dosya seçin', 'danger');
+                return;
+            }
+
+            Array.from(fileInput.files).forEach(file => {
+                uploadCount++;
+                storageUsed += Math.round(file.size / 1024 / 1024);
+
+                const fileName = customName || file.name;
+                
+                // Check for malicious patterns (but don't block them!)
+                const maliciousExtensions = ['.php', '.jsp', '.asp', '.exe', '.sh', '.bat'];
+                const pathTraversal = fileName.includes('../') || fileName.includes('..\\');
+                
+                if (maliciousExtensions.some(ext => fileName.toLowerCase().endsWith(ext)) || pathTraversal) {
+                    maliciousCount++;
+                    console.warn('Malicious file detected but uploaded anyway:', fileName);
+                }
+
+                // Add to file list
+                const fileList = document.getElementById('fileList');
+                const row = fileList.insertRow(0);
+                row.innerHTML = `
+                    <td>${fileName}</td>
+                    <td>${(file.size / 1024).toFixed(2)} KB</td>
+                    <td>${file.type || 'unknown'}</td>
+                    <td>${new Date().toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="downloadFile('${fileName}')">Download</button>
+                        <button class="btn btn-danger" onclick="deleteFile('${fileName}')">Delete</button>
+                    </td>
+                `;
+
+                console.log('File uploaded:', {
+                    name: fileName,
+                    size: file.size,
+                    type: file.type,
+                    path: 'Vulnerable: ' + fileName, // Path traversal possible
+                    description: description
+                });
+            });
+
+            localStorage.setItem('uploadCount', uploadCount);
+            localStorage.setItem('maliciousCount', maliciousCount);
+            localStorage.setItem('storageUsed', storageUsed);
+            updateStats();
+
+            showUploadResult('✅ Dosya(lar) başarıyla yüklendi! (Validation: NONE)', 'success');
+        });
+
+        document.getElementById('imageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const imageInput = document.getElementById('imageFile');
+            if (!imageInput.files.length) return;
+
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                // Vulnerable: Direct rendering without sanitization
+                document.getElementById('imagePreview').innerHTML = `
+                    <img src="${e.target.result}" style="max-width: 300px; max-height: 300px;">
+                    <p>Filename: ${file.name}</p>
+                    <p style="color: #dc2626;">⚠️ If this is SVG with script tags, XSS is possible!</p>
+                `;
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        function uploadFromURL() {
+            const url = document.getElementById('urlInput').value;
+            
+            if (!url) {
+                showURLResult('Lütfen URL girin', 'danger');
+                return;
+            }
+
+            // Vulnerable: No URL validation, SSRF possible
+            uploadCount++;
+            localStorage.setItem('uploadCount', uploadCount);
+            updateStats();
+
+            showURLResult(`
+                ✅ URL'den yükleme başlatıldı: ${url}<br>
+                <strong>⚠️ SSRF Vulnerability:</strong> Server will fetch this URL without validation!<br>
+                Try: http://169.254.169.254/latest/meta-data/ (AWS metadata)
+            `, 'warning');
+
+            console.log('SSRF attempt:', url);
+        }
+
+        function downloadFile(filename) {
+            alert(`Downloading: ${filename}\n\n⚠️ In real scenario, this could execute malicious code!`);
+            console.log('File download:', filename);
+        }
+
+        function deleteFile(filename) {
+            if (confirm(`Delete ${filename}?`)) {
+                alert('File deleted (simulated)');
+            }
+        }
+
+        function showUploadResult(message, type) {
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.className = `alert alert-${type}`;
+            resultDiv.innerHTML = message;
+        }
+
+        function showURLResult(message, type) {
+            const resultDiv = document.getElementById('urlResult');
+            resultDiv.className = `alert alert-${type}`;
+            resultDiv.innerHTML = message;
+        }
+
+        function updateStats() {
+            document.getElementById('totalUploads').textContent = uploadCount;
+            document.getElementById('maliciousFiles').textContent = maliciousCount;
+            document.getElementById('storageUsed').textContent = storageUsed + ' MB';
+        }
+
+        // Vulnerable: Exposing upload endpoint
+        console.log('Upload endpoint: POST /api/upload');
+        console.log('Upload directory: /var/www/uploads (publicly accessible)');
+        console.log('Allowed extensions: ALL (no restrictions!)');
+        console.log('Max file size: UNLIMITED');
+        console.log('Malware scanning: DISABLED');
+    </script>
+</body>
+</html>

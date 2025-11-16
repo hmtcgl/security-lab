@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Challenge - OWASP Automated Threats</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">🔐 Security Lab</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="bot-challenge.html">Bot Challenge</a></li>
+                <li><a href="api-test.html">API Test</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>🤖 OWASP Automated Threats Top 21</h1>
+            <p class="subtitle">Bot Detection | Rate Limiting | CAPTCHA Bypass</p>
+        </div>
+
+        <div class="warning-box">
+            <h2>⚠️ Bot Testing Environment</h2>
+            <p>Bu sayfa bot ve automated threat testleri için tasarlanmıştır. CAPTCHA, rate limiting ve bot detection eksiklikleri içerir.</p>
+        </div>
+
+        <div class="test-categories">
+            <div class="category-card">
+                <h3>🎯 OAT-001: Carding</h3>
+                <p>Kredi kartı doğrulama sistemi - Bot ile test edilebilir</p>
+                <form id="cardingForm" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <input type="text" placeholder="Kart Numarası" id="cardNumber" maxlength="16">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" placeholder="CVV" id="cvv" maxlength="3">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Doğrula</button>
+                    <p id="cardResult" style="margin-top: 0.5rem; color: #6b7280;"></p>
+                </form>
+                <small>⚠️ Rate limit: YOK | CAPTCHA: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-005: Scalping</h3>
+                <p>Sınırlı ürün satın alma - Bot advantage mevcut</p>
+                <div style="margin-top: 1rem;">
+                    <p><strong>Limited Edition Product</strong></p>
+                    <p>Kalan: <strong id="stockCount">100</strong> adet</p>
+                    <button class="btn btn-success" onclick="buyProduct()">Satın Al</button>
+                    <p id="buyResult" style="margin-top: 0.5rem;"></p>
+                </div>
+                <small>⚠️ Bot protection: YOK | Queue system: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-007: Credential Cracking</h3>
+                <p>Brute force saldırıları için açık</p>
+                <form id="crackForm" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <input type="text" placeholder="Username" id="crackUser">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" placeholder="Password" id="crackPass">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Deneme</button>
+                    <p id="crackResult" style="margin-top: 0.5rem;"></p>
+                </form>
+                <small>⚠️ Rate limit: YOK | Account lockout: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-008: Credential Stuffing</h3>
+                <p>Sızdırılmış kimlik bilgileri testi</p>
+                <button class="btn btn-primary" onclick="testCredentials()">Kimlik Bilgilerini Test Et</button>
+                <div id="stuffingResults" style="margin-top: 1rem;"></div>
+                <small>⚠️ CAPTCHA: YOK | IP blocking: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-011: Scraping</h3>
+                <p>Veri toplama - Bot detection yok</p>
+                <button class="btn btn-primary" onclick="scrapeData()">Verileri Topla</button>
+                <div id="scrapedData" class="code-block" style="margin-top: 1rem; display: none;"></div>
+                <small>⚠️ Rate limit: YOK | Bot detection: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-013: Sniping</h3>
+                <p>Son dakika teklifleri - Timing exploit</p>
+                <div style="margin-top: 1rem;">
+                    <p>Açık artırma bitiş: <strong id="auctionTimer">00:10</strong></p>
+                    <input type="number" placeholder="Teklif miktarı" id="bidAmount">
+                    <button class="btn btn-primary" onclick="placeBid()">Teklif Ver</button>
+                    <p id="bidResult" style="margin-top: 0.5rem;"></p>
+                </div>
+                <small>⚠️ Last-second bid prevention: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-015: Denial of Service</h3>
+                <p>Resource exhaustion testi</p>
+                <button class="btn btn-danger" onclick="triggerDoS()">DoS Simüle Et</button>
+                <p id="dosResult" style="margin-top: 0.5rem;"></p>
+                <small>⚠️ Rate limiting: YOK | Resource limits: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-020: Account Aggregation</h3>
+                <p>Toplu hesap bilgisi çekme</p>
+                <button class="btn btn-primary" onclick="aggregateAccounts()">Hesapları Topla</button>
+                <div id="aggregateResults" style="margin-top: 1rem;"></div>
+                <small>⚠️ Detection: YOK | CAPTCHA: YOK</small>
+            </div>
+
+            <div class="category-card">
+                <h3>🎯 OAT-021: Denial of Inventory</h3>
+                <p>Stok manipülasyonu</p>
+                <button class="btn btn-warning" onclick="holdInventory()">Stok Tut</button>
+                <p id="inventoryResult" style="margin-top: 0.5rem;"></p>
+                <small>⚠️ Cart timeout: YOK | Limit: YOK</small>
+            </div>
+        </div>
+
+        <!-- Bot Activity Monitor -->
+        <div class="stats-section">
+            <h2>📊 Bot Activity Monitor</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>Toplam İstek</h3>
+                    <p class="stat-number" id="totalRequests">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Bot Trafiği %</h3>
+                    <p class="stat-number" id="botTraffic">0%</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Engellenen</h3>
+                    <p class="stat-number" id="blockedBots">0</p>
+                </div>
+            </div>
+            <p style="margin-top: 1rem; color: #dc2626;">⚠️ Bot detection: DISABLED | Rate limiting: DISABLED</p>
+        </div>
+
+        <!-- Request Logs -->
+        <div class="data-table">
+            <h3 style="padding: 1rem;">📋 Request Logs (Real-time)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>IP Address</th>
+                        <th>User-Agent</th>
+                        <th>Endpoint</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="requestLogs">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>🔓 Deliberately Vulnerable to Automated Threats</p>
+    </footer>
+
+    <script>
+        let totalRequests = 0;
+        let botRequests = 0;
+        let stockCount = 100;
+        let auctionTime = 10;
+
+        // Track requests
+        function logRequest(endpoint, status = 'Success') {
+            totalRequests++;
+            
+            // Vulnerable: No bot detection
+            const isBot = Math.random() > 0.5; // Simulated
+            if (isBot) botRequests++;
+
+            document.getElementById('totalRequests').textContent = totalRequests;
+            document.getElementById('botTraffic').textContent = Math.round((botRequests / totalRequests) * 100) + '%';
+
+            const logsTable = document.getElementById('requestLogs');
+            const row = logsTable.insertRow(0);
+            
+            // Vulnerable: Exposing internal IPs
+            row.innerHTML = `
+                <td>${new Date().toLocaleTimeString()}</td>
+                <td>${generateFakeIP()}</td>
+                <td>${navigator.userAgent.substring(0, 30)}...</td>
+                <td>${endpoint}</td>
+                <td><span class="badge badge-success">${status}</span></td>
+            `;
+
+            if (logsTable.rows.length > 20) {
+                logsTable.deleteRow(20);
+            }
+        }
+
+        function generateFakeIP() {
+            return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+
+        // OAT-001: Carding
+        document.getElementById('cardingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cardNum = document.getElementById('cardNumber').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            logRequest('/api/validate-card', 'Success');
+            
+            // Vulnerable: No rate limiting, easy to brute force
+            const isValid = cardNum.length === 16 && cvv.length === 3;
+            document.getElementById('cardResult').textContent = isValid ? 
+                '✅ Kart geçerli! (Gerçek sistemde böyle olmamalı)' : 
+                '❌ Geçersiz kart';
+            document.getElementById('cardResult').style.color = isValid ? '#10b981' : '#dc2626';
+        });
+
+        // OAT-005: Scalping
+        function buyProduct() {
+            if (stockCount > 0) {
+                stockCount--;
+                document.getElementById('stockCount').textContent = stockCount;
+                document.getElementById('buyResult').innerHTML = '<span style="color: #10b981;">✅ Satın alındı!</span>';
+                logRequest('/api/buy-product', 'Success');
+            } else {
+                document.getElementById('buyResult').innerHTML = '<span style="color: #dc2626;">❌ Stok tükendi</span>';
+            }
+        }
+
+        // OAT-007: Credential Cracking
+        document.getElementById('crackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('crackUser').value;
+            const pass = document.getElementById('crackPass').value;
+            
+            logRequest('/api/login-attempt', 'Failed');
+            
+            // Vulnerable: No account lockout, unlimited attempts
+            const correct = (user === 'admin' && pass === 'admin123');
+            document.getElementById('crackResult').textContent = correct ? 
+                '✅ GİRİŞ BAŞARILI!' : 
+                '❌ Yanlış şifre. Sınırsız deneme hakkınız var!';
+            document.getElementById('crackResult').style.color = correct ? '#10b981' : '#dc2626';
+        });
+
+        // OAT-008: Credential Stuffing
+        function testCredentials() {
+            const testCreds = [
+                'user1@test.com:password123',
+                'admin@test.com:Admin123!',
+                'test@example.com:test123',
+                'user@domain.com:qwerty'
+            ];
+
+            let results = '<h4>Test Sonuçları:</h4><ul>';
+            testCreds.forEach(cred => {
+                const [email, pass] = cred.split(':');
+                const valid = email === 'admin@test.com' && pass === 'Admin123!';
+                results += `<li>${email} - ${valid ? '<span style="color: #10b981;">✅ GEÇERLİ</span>' : '<span style="color: #dc2626;">❌ Geçersiz</span>'}</li>`;
+                logRequest('/api/credential-check', valid ? 'Valid' : 'Invalid');
+            });
+            results += '</ul>';
+            
+            document.getElementById('stuffingResults').innerHTML = results;
+        }
+
+        // OAT-011: Scraping
+        function scrapeData() {
+            const data = {
+                users: [
+                    { id: 1, email: 'admin@test.com', role: 'admin' },
+                    { id: 2, email: 'user@test.com', role: 'user' },
+                    { id: 3, email: 'test@test.com', role: 'user' }
+                ],
+                products: [
+                    { id: 1, name: 'Product A', price: 99.99 },
+                    { id: 2, name: 'Product B', price: 149.99 }
+                ],
+                internalIPs: ['192.168.1.100', '10.0.0.50'],
+                apiKeys: ['sk-test-key-123', 'api-key-xyz-789']
+            };
+
+            document.getElementById('scrapedData').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('scrapedData').style.display = 'block';
+            logRequest('/api/scrape-data', 'Success');
+        }
+
+        // OAT-013: Sniping
+        let auctionInterval = setInterval(() => {
+            auctionTime--;
+            document.getElementById('auctionTimer').textContent = `00:${auctionTime.toString().padStart(2, '0')}`;
+            if (auctionTime <= 0) {
+                clearInterval(auctionInterval);
+                document.getElementById('auctionTimer').textContent = 'BİTTİ';
+            }
+        }, 1000);
+
+        function placeBid() {
+            if (auctionTime > 0) {
+                logRequest('/api/place-bid', 'Success');
+                document.getElementById('bidResult').innerHTML = '<span style="color: #10b981;">✅ Teklif verildi!</span>';
+            } else {
+                document.getElementById('bidResult').innerHTML = '<span style="color: #dc2626;">❌ Açık artırma bitti</span>';
+            }
+        }
+
+        // OAT-015: DoS
+        function triggerDoS() {
+            for (let i = 0; i < 100; i++) {
+                logRequest('/api/heavy-operation', 'Processing');
+            }
+            document.getElementById('dosResult').innerHTML = '<span style="color: #dc2626;">⚠️ 100 istek gönderildi! Sunucu yükü arttı.</span>';
+        }
+
+        // OAT-020: Account Aggregation
+        function aggregateAccounts() {
+            const accounts = [
+                { email: 'user1@test.com', balance: 1250.50, lastLogin: '2024-01-15' },
+                { email: 'user2@test.com', balance: 3420.00, lastLogin: '2024-01-14' },
+                { email: 'admin@test.com', balance: 99999.99, lastLogin: '2024-01-16' }
+            ];
+
+            let html = '<div class="data-table"><table><thead><tr><th>Email</th><th>Balance</th><th>Last Login</th></tr></thead><tbody>';
+            accounts.forEach(acc => {
+                html += `<tr><td>${acc.email}</td><td>$${acc.balance}</td><td>${acc.lastLogin}</td></tr>`;
+                logRequest('/api/get-account-info', 'Success');
+            });
+            html += '</tbody></table></div>';
+            
+            document.getElementById('aggregateResults').innerHTML = html;
+        }
+
+        // OAT-021: Denial of Inventory
+        function holdInventory() {
+            logRequest('/api/add-to-cart', 'Success');
+            document.getElementById('inventoryResult').innerHTML = '<span style="color: #f59e0b;">⚠️ 50 ürün sepete eklendi. Timeout yok!</span>';
+        }
+
+        // Vulnerable: Exposing bot detection status
+        console.log('Bot Detection: DISABLED');
+        console.log('Rate Limiting: DISABLED');
+        console.log('CAPTCHA: DISABLED');
+        console.log('WAF: DISABLED');
+    </script>
+</body>
+</html>
