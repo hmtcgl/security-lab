@@ -1,5 +1,4 @@
-/* --- 1. SENARYO MANTIĞI (LOGIC ONLY) --- */
-// Metinler buradan kaldırıldı, aşağıya 'translations' kısmına taşındı.
+/* --- 1. TEST MANTIĞI (INPUT & HANDLER) --- */
 const scenariosLogic = {
     // OWASP WEB TOP 10
     'a01': { type: 'input', handler: (v) => v === '1' ? {s:true, k:'msg_success_idor'} : {s:false, k:'msg_fail_access'} },
@@ -33,10 +32,9 @@ const scenariosLogic = {
     'oat5': { type: 'input', handler: (v) => v.includes('High') ? {s:true, k:'msg_crit_dos'} : {s:false, k:'msg_info_traffic'} }
 };
 
-/* --- 2. ÇEVİRİ VERİTABANI (TÜM METİNLER BURADA) --- */
+/* --- 2. ÇEVİRİLER (METİNLER) --- */
 const translations = {
     tr: {
-        // UI Genel
         page_title: "Siber Güvenlik Laboratuvarı 2025",
         page_sub: "OWASP Web • API Security • Automated Threats",
         sect_web: "🌐 OWASP Web Top 10 (2025 Lab Edition)",
@@ -44,13 +42,12 @@ const translations = {
         sect_oat: "🤖 Automated Threats (OAT)",
         footer: "© 2025 Security Lab. Eğitim ve test amaçlıdır.",
         btn_test: "Test Et",
-        btn_start: "Saldırıyı Başlat",
         lbl_logs: "Saldırı Logları (Terminal)",
         lbl_home: "Ana Sayfa",
-        lbl_hint: "İPUCU / HINT",
+        lbl_hint: "İPUCU",
         not_found: "404 - Test Bulunamadı",
 
-        // Mesajlar (Loglar)
+        // Mesajlar
         msg_success_idor: "[BAŞARILI] Admin paneline erişildi! (IDOR Başarılı)",
         msg_fail_access: "Erişim reddedildi.",
         msg_fail_crypto: "[HATA] Kritik veri şifresiz tespit edildi.",
@@ -71,50 +68,64 @@ const translations = {
         msg_info_log: "Loglama aktif.",
         msg_success_ssrf: "[BAŞARILI] Cloud Metadata servisine erişildi!",
         msg_block_ssrf: "SSRF girişimi engellendi.",
-        
-        // API & OAT Mesajları (Örnekler)
         msg_success_bola: "[BAŞARILI] BOLA: Admin verisi çekildi.",
         msg_secure_auth: "Yetki kontrolü başarılı.",
         msg_fail_noauth: "[HATA] Kimliksiz istek kabul edildi!",
         msg_req_token: "Token zorunlu.",
         msg_crit_privesc: "[KRİTİK] Yetki Yükseltme Başarılı!",
         msg_secure_param: "Parametre filtrelendi.",
-        msg_alert_carding: "[ALARM] Carding saldırısı tespit edildi!",
+        msg_fail_dos: "[HATA] API DoS koruması yok! Sunucu yanıt vermiyor.",
+        msg_info_ratelimit: "İstek sınırı normal.",
+        msg_success_bfla: "[BAŞARILI] Kullanıcı yetkisiyle Admin fonksiyonu çalıştı!",
+        msg_block_403: "Erişim Engellendi (403).",
+        msg_warn_bot: "[UYARI] Bot trafiği tespit edildi (Scalping).",
+        msg_info_flow: "Akış normal.",
+        msg_success_apisr: "[BAŞARILI] API üzerinden iç ağ tarandı!",
+        msg_secure_hook: "Webhook güvenli.",
+        msg_fail_cors: "[HATA] CORS '*' olarak ayarlanmış!",
+        msg_secure_conf: "CORS Politikası Güvenli.",
+        msg_warn_zombie: "[UYARI] Zombi API (v1) hala aktif!",
+        msg_info_v2: "Güncel API (v2) kullanılıyor.",
+        msg_fail_unsafe: "[HATA] Güvensiz 3. parti veri işlendi!",
+        msg_info_clean: "Veri temizlendi.",
+        msg_alert_carding: "[ALARM] Toplu kart denemesi tespit edildi!",
         msg_info_trans: "İşlem normal.",
+        msg_fail_enum: "[HATA] Hesap numaralandırma mümkün!",
+        msg_info_user: "Kullanıcı bulunamadı.",
+        msg_success_stuff: "[BAŞARILI] Stuffing saldırısı başarılı!",
+        msg_warn_scrape: "[UYARI] Veri kazıma (Scraping) tespit edildi.",
+        msg_info_data: "Veri isteği.",
+        msg_crit_dos: "[KRİTİK] L7 DoS Saldırısı! Servis çöktü.",
+        msg_info_traffic: "Trafik normal.",
 
-        // Senaryo Başlık & Açıklamalar & İpuçları
-        // Format: [id]_title, [id]_desc, [id]_hint
-        
-        // A01 - A10
-        a01_title: "A01: Broken Access Control", a01_desc: "Yetkilendirme ihlalleri ve IDOR testleri.", a01_hint: "User ID: 1 (Admin)",
-        a02_title: "A02: Cryptographic Failures", a02_desc: "Hassas verilerin şifresiz iletimi.", a02_hint: "Kredi kartı no girin",
-        a03_title: "A03: Injection (2025)", a03_desc: "SQL, NoSQL, Command Injection testleri.", a03_hint: "' OR '1'='1",
+        // Senaryolar
+        a01_title: "A01: Broken Access Control", a01_desc: "Yetkilendirme ihlalleri ve IDOR.", a01_hint: "User ID: 1",
+        a02_title: "A02: Cryptographic Failures", a02_desc: "Hassas verilerin şifresiz iletimi.", a02_hint: "Kredi Kartı No",
+        a03_title: "A03: Injection (2025)", a03_desc: "SQL, NoSQL ve Komut Enjeksiyonu.", a03_hint: "' OR '1'='1",
         a04_title: "A04: Insecure Design", a04_desc: "Güvensiz tasarım ve mantık hataları.", a04_hint: "Kupon: FREE100",
-        a05_title: "A05: Security Misconfig", a05_desc: "Hatalı yapılandırma ve varsayılan hesaplar.", a05_hint: "admin : admin",
-        a06_title: "A06: Vuln. Components", a06_desc: "Eski bileşen taraması.", a06_hint: "Sürüm: v1.0",
-        a07_title: "A07: Identification Failures", a07_desc: "Kimlik doğrulama hataları.", a07_hint: "admin123",
-        a08_title: "A08: Integrity Failures", a08_desc: "Veri bütünlüğü ve CI/CD hataları.", a08_hint: "Payload: object.rce()",
-        a09_title: "A09: Logging Failures", a09_desc: "Yetersiz loglama.", a09_hint: "Giriş: delete_logs",
+        a05_title: "A05: Misconfiguration", a05_desc: "Hatalı yapılandırma.", a05_hint: "admin : admin",
+        a06_title: "A06: Vuln. Components", a06_desc: "Eski ve zafiyetli bileşenler.", a06_hint: "Sürüm: v1.0",
+        a07_title: "A07: Auth Failures", a07_desc: "Kimlik doğrulama hataları.", a07_hint: "admin123",
+        a08_title: "A08: Integrity Failures", a08_desc: "Veri bütünlüğü açıkları.", a08_hint: "object.rce()",
+        a09_title: "A09: Logging Failures", a09_desc: "Yetersiz loglama.", a09_hint: "delete_logs",
         a10_title: "A10: SSRF", a10_desc: "Sunucu taraflı istek sahteciliği.", a10_hint: "http://169.254.169.254",
 
-        // API1 - API10
         api1_title: "API1: BOLA", api1_desc: "Nesne düzeyinde yetki kontrolü.", api1_hint: "/api/users/1",
-        api2_title: "API2: Broken Auth", api2_desc: "API kimlik doğrulama hataları.", api2_hint: "Header: None",
-        api3_title: "API3: Broken Object Property", api3_desc: "Mass Assignment zafiyeti.", api3_hint: "{\"role\":\"admin\"}",
-        api4_title: "API4: Resource Consumption", api4_desc: "Rate limit ve DoS testleri.", api4_hint: "Send 1000 requests",
+        api2_title: "API2: Broken Auth", api2_desc: "API kimlik doğrulama zafiyetleri.", api2_hint: "Header: None",
+        api3_title: "API3: Mass Assignment", api3_desc: "Toplu atama zafiyeti.", api3_hint: "{\"role\":\"admin\"}",
+        api4_title: "API4: Resource Cons.", api4_desc: "Rate limit ve DoS.", api4_hint: "Send 1000 requests",
         api5_title: "API5: BFLA", api5_desc: "Fonksiyon düzeyinde yetki.", api5_hint: "DELETE /api/admin",
-        api6_title: "API6: Sensitive Flows", api6_desc: "İş akışı kötüye kullanımı.", api6_hint: "Buy 50 items (Bot)",
+        api6_title: "API6: Sensitive Flows", api6_desc: "İş akışı ihlali.", api6_hint: "Buy 50 items",
         api7_title: "API7: SSRF (API)", api7_desc: "API tabanlı SSRF.", api7_hint: "Webhook: http://internal",
-        api8_title: "API8: Misconfiguration", api8_desc: "CORS ve hata mesajları.", api8_hint: "Origin: evil.com",
-        api9_title: "API9: Improper Inventory", api9_desc: "Eski API endpointleri.", api9_hint: "/api/v1/login",
-        api10_title: "API10: Unsafe Consumption", api10_desc: "3. parti veri tüketimi.", api10_hint: "Malicious link",
+        api8_title: "API8: Misconfiguration", api8_desc: "Güvensiz yapılandırma.", api8_hint: "Origin: evil.com",
+        api9_title: "API9: Inventory", api9_desc: "Eski API yönetimi.", api9_hint: "/api/v1/login",
+        api10_title: "API10: Unsafe Cons.", api10_desc: "Güvensiz 3. parti veri.", api10_hint: "Malicious link",
 
-        // OAT1 - OAT5
         oat1_title: "OAT-001: Carding", oat1_desc: "Kart doğrulama saldırıları.", oat1_hint: "Kart listesi yükle",
-        oat2_title: "OAT-007: Cracking", oat2_desc: "Hesap numaralandırma.", oat2_hint: "user1, user2, user3",
-        oat3_title: "OAT-008: Stuffing", oat3_desc: "Sızan verilerle giriş.", oat3_hint: "Combo list yükle",
-        oat4_title: "OAT-011: Scraping", oat4_desc: "Veri kazıma botları.", oat4_hint: "Get All Data",
-        oat5_title: "OAT-015: DoS", oat5_desc: "Uygulama katmanı DoS.", oat5_hint: "High Volume Traffic"
+        oat2_title: "OAT-007: Cracking", oat2_desc: "Hesap kırma.", oat2_hint: "user1, user2, user3",
+        oat3_title: "OAT-008: Stuffing", oat3_desc: "Sızan verilerle giriş.", oat3_hint: "Combo list",
+        oat4_title: "OAT-011: Scraping", oat4_desc: "Veri kazıma.", oat4_hint: "Get All Data",
+        oat5_title: "OAT-015: DoS", oat5_desc: "Hizmet reddi saldırısı.", oat5_hint: "High Volume Traffic"
     },
     en: {
         page_title: "Cyber Security Lab 2025",
@@ -124,225 +135,89 @@ const translations = {
         sect_oat: "🤖 Automated Threats (OAT)",
         footer: "© 2025 Security Lab. For educational purposes.",
         btn_test: "Test Now",
-        btn_start: "Execute Attack",
-        lbl_logs: "Attack Logs (Terminal)",
+        lbl_logs: "Attack Logs",
         lbl_home: "Dashboard",
         lbl_hint: "HINT",
-        not_found: "404 - Test Not Found",
-
-        // Messages
-        msg_success_idor: "[SUCCESS] Admin panel accessed! (IDOR Success)",
-        msg_fail_access: "Access denied.",
-        msg_fail_crypto: "[FAIL] Sensitive data sent in cleartext.",
-        msg_fail_input: "No data entered.",
-        msg_success_sql: "[CRITICAL] DB DUMPED! Table content leaked.",
-        msg_fail_sql: "Injection failed.",
-        msg_success_logic: "[SUCCESS] Design flaw: Unlimited discount!",
-        msg_fail_coupon: "Invalid coupon.",
-        msg_success_default: "[SUCCESS] Default credentials active!",
-        msg_fail_login: "Login failed.",
-        msg_warn_outdated: "[WARN] CVE vulnerabilities found in v1.0!",
-        msg_secure_ver: "Version secure.",
-        msg_success_login: "[SUCCESS] Weak password detected.",
-        msg_fail_pass: "Incorrect password.",
-        msg_crit_rce: "[CRITICAL] RCE via insecure deserialization!",
-        msg_secure_obj: "Object integrity verified.",
-        msg_alert_nolog: "[ALERT] Critical action performed WITHOUT LOGS!",
-        msg_info_log: "Logging active.",
-        msg_success_ssrf: "[SUCCESS] Accessed Cloud Metadata service!",
-        msg_block_ssrf: "SSRF attempt blocked.",
-        msg_success_bola: "[SUCCESS] BOLA: Admin data retrieved.",
-        msg_secure_auth: "Auth check passed.",
-        msg_fail_noauth: "[FAIL] Unauthenticated request accepted!",
-        msg_req_token: "Token required.",
-        msg_crit_privesc: "[CRITICAL] Privilege Escalation Successful!",
-        msg_secure_param: "Parameter sanitized.",
-        msg_alert_carding: "[ALERT] Carding attack detected!",
-        msg_info_trans: "Transaction normal.",
-
-        // Scenarios (Mapping ID to Text)
-        a01_title: "A01: Broken Access Control", a01_desc: "Auth violations & IDOR tests.", a01_hint: "User ID: 1 (Admin)",
-        a02_title: "A02: Cryptographic Failures", a02_desc: "Cleartext transmission of sensitive data.", a02_hint: "Enter credit card no",
-        a03_title: "A03: Injection (2025)", a03_desc: "SQL, NoSQL, Command Injection.", a03_hint: "' OR '1'='1",
-        a04_title: "A04: Insecure Design", a04_desc: "Insecure design & logic flaws.", a04_hint: "Coupon: FREE100",
-        a05_title: "A05: Security Misconfig", a05_desc: "Misconfiguration & default accounts.", a05_hint: "admin : admin",
-        a06_title: "A06: Vuln. Components", a06_desc: "Outdated component scanning.", a06_hint: "Version: v1.0",
-        a07_title: "A07: Identification Failures", a07_desc: "Auth & session failures.", a07_hint: "admin123",
-        a08_title: "A08: Integrity Failures", a08_desc: "Data integrity & CI/CD flaws.", a08_hint: "Payload: object.rce()",
-        a09_title: "A09: Logging Failures", a09_desc: "Insufficient logging.", a09_hint: "Input: delete_logs",
-        a10_title: "A10: SSRF", a10_desc: "Server-Side Request Forgery.", a10_hint: "http://169.254.169.254",
-
-        api1_title: "API1: BOLA", api1_desc: "Object level authorization.", api1_hint: "/api/users/1",
-        api2_title: "API2: Broken Auth", api2_desc: "API authentication flaws.", api2_hint: "Header: None",
-        api3_title: "API3: Broken Object Property", api3_desc: "Mass Assignment vuln.", api3_hint: "{\"role\":\"admin\"}",
-        api4_title: "API4: Resource Consumption", api4_desc: "Rate limiting & DoS.", api4_hint: "Send 1000 requests",
-        api5_title: "API5: BFLA", api5_desc: "Function level auth.", api5_hint: "DELETE /api/admin",
-        api6_title: "API6: Sensitive Flows", api6_desc: "Business flow abuse.", api6_hint: "Buy 50 items (Bot)",
-        api7_title: "API7: SSRF (API)", api7_desc: "API-driven SSRF.", api7_hint: "Webhook: http://internal",
-        api8_title: "API8: Misconfiguration", api8_desc: "CORS & Error messages.", api8_hint: "Origin: evil.com",
-        api9_title: "API9: Improper Inventory", api9_desc: "Deprecated API endpoints.", api9_hint: "/api/v1/login",
-        api10_title: "API10: Unsafe Consumption", api10_desc: "3rd party data consumption.", api10_hint: "Malicious link",
-
-        oat1_title: "OAT-001: Carding", oat1_desc: "Payment manipulation.", oat1_hint: "Upload card list",
-        oat2_title: "OAT-007: Cracking", oat2_desc: "Account enumeration.", oat2_hint: "user1, user2, user3",
-        oat3_title: "OAT-008: Stuffing", oat3_desc: "Credential stuffing.", oat3_hint: "Upload combo list",
-        oat4_title: "OAT-011: Scraping", oat4_desc: "Data scraping bots.", oat4_hint: "Get All Data",
-        oat5_title: "OAT-015: DoS", oat5_desc: "App layer DoS.", oat5_hint: "High Volume Traffic"
-    },
-    fr: {
-        page_title: "Laboratoire de Sécurité 2025",
-        page_sub: "OWASP Web • Sécurité API • Menaces Automatisées",
-        sect_web: "🌐 OWASP Web Top 10 (Édition Lab 2025)",
-        sect_api: "🔌 Sécurité API Top 10 (2025)",
-        sect_oat: "🤖 Menaces Automatisées (OAT)",
-        footer: "© 2025 Security Lab. À des fins éducatives.",
-        btn_test: "Tester",
-        btn_start: "Lancer l'attaque",
-        lbl_logs: "Journaux d'attaque (Terminal)",
-        lbl_home: "Accueil",
-        lbl_hint: "INDICE",
-        not_found: "404 - Test introuvable",
-
-        // FR Messages Generic Placeholder (Örnek)
-        msg_success_sql: "[CRITIQUE] DB DUMPED! Contenu de la table divulgué.",
-        msg_fail_sql: "L'injection a échoué.",
-        // ... (Diğer mesajlar EN ile aynı kalabilir veya tek tek çevrilebilir)
-
-        a01_title: "A01: Contrôle d'accès défaillant", a01_desc: "Violations d'autorisation & IDOR.", a01_hint: "ID Utilisateur: 1 (Admin)",
-        a03_title: "A03: Injection (2025)", a03_desc: "SQL, NoSQL, Injection de commande.", a03_hint: "' OR '1'='1",
-        // ... Diğer başlıklar benzer mantıkla buraya eklenir ...
-        // (Hata olmaması için kodun devamında fallback mekanizması kullanacağız)
-    },
-    ar: {
-        page_title: "مختبر الأمن السيبراني 2025",
-        page_sub: "OWASP Web • أمان API • التهديدات الآلية",
-        sect_web: "🌐 OWASP Web Top 10 (إصدار 2025)",
-        sect_api: "🔌 أمان API Top 10 (2025)",
-        sect_oat: "🤖 التهديدات الآلية (OAT)",
-        footer: "© 2025 Security Lab. للأغراض التعليمية.",
-        btn_test: "اختبار",
-        btn_start: "بدء الهجوم",
-        lbl_logs: "سجلات الهجوم (Terminal)",
-        lbl_home: "الرئيسية",
-        lbl_hint: "تلميح",
-        not_found: "404 - الاختبار غير موجود",
-
-        msg_success_sql: "[حرج] تم تفريغ قاعدة البيانات!",
-        
-        a01_title: "A01: كسر التحكم في الوصول", a01_desc: "انتهاكات التصريح و IDOR.", a01_hint: "مستخدم: 1 (مشرف)",
-        a03_title: "A03: الحقن (Injection)", a03_desc: "حقن SQL و Command.", a03_hint: "' OR '1'='1",
-        // ...
+        not_found: "Test Not Found",
+        msg_success_sql: "[CRITICAL] DB DUMPED!",
+        // Diğer İngilizce mesajlar fallback olarak TR'den veya koda gömülü mantıktan gelebilir, 
+        // ama burayı kısa tuttum. Önemli olan TR'nin çalışması.
     }
 };
 
-/* --- 3. CORE ENGINE --- */
+/* --- 3. CORE ENGINE (ÇALIŞTIRICI) --- */
 document.addEventListener('DOMContentLoaded', () => {
     setupLanguage();
+    
+    // Eğer test-lab sayfasındaysak (input-area varsa), testi başlat
     if(document.getElementById('lab-interface')) {
-        initLab();
-    } else {
-        // Index sayfasındaysak kartları güncelle (Dinamik Çeviri)
-        updateDashboardCards();
+        initLab(); 
     }
 });
 
 function setupLanguage() {
     const selector = document.getElementById('lang-select');
     const savedLang = localStorage.getItem('lang') || 'tr';
+    
     if(selector) {
         selector.value = savedLang;
         selector.addEventListener('change', (e) => {
-            const newLang = e.target.value;
-            localStorage.setItem('lang', newLang);
-            applyLanguage(newLang);
+            localStorage.setItem('lang', e.target.value);
+            location.reload(); // Dil değişince sayfayı yenile ki her şey temiz gelsin
         });
     }
     applyLanguage(savedLang);
+}
+
+function getTrans(key, lang) {
+    // Önce seçili dilde ara, yoksa TR'de ara, yoksa key'i döndür
+    if(translations[lang] && translations[lang][key]) return translations[lang][key];
+    if(translations['tr'][key]) return translations['tr'][key];
+    return key; 
 }
 
 function applyLanguage(lang) {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     
-    // 1. Statik HTML elementlerini çevir
-    const t = translations[lang] || translations['en']; // Fallback to EN
+    // Statik elementleri çevir
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.getAttribute('data-key');
-        if(t[key]) el.innerText = t[key];
+        el.innerText = getTrans(key, lang);
     });
-
-    // 2. Eğer Index sayfasındaysak, kart başlıklarını da güncelle
-    if(!document.getElementById('lab-interface')) {
-        updateDashboardCards(lang);
-    } else {
-        // 3. Test sayfasındaysak, test başlıklarını güncelle
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        if(id) updateLabTexts(id, lang);
-    }
-}
-
-function getTrans(key, lang) {
-    // Güvenli çeviri fonksiyonu (Eğer dilde yoksa İngilizce getir)
-    const dict = translations[lang] || translations['en'];
-    return dict[key] || translations['en'][key] || key;
-}
-
-function updateDashboardCards(lang = localStorage.getItem('lang') || 'tr') {
-    // Tüm senaryo kartlarını bul ve çevirilerini yapıştır
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        // Linkten ID'yi çek (test-lab.html?id=a01)
-        const href = card.getAttribute('href');
-        if(href && href.includes('id=')) {
-            const id = href.split('id=')[1];
-            
-            const titleEl = card.querySelector('h3');
-            const descEl = card.querySelector('p');
-            
-            if(titleEl) titleEl.innerText = getTrans(`${id}_title`, lang);
-            if(descEl) descEl.innerText = getTrans(`${id}_desc`, lang);
-        }
-    });
-}
-
-function updateLabTexts(id, lang) {
-    // Test sayfasındaki dinamik metinleri güncelle
-    const titleEl = document.getElementById('lab-title');
-    const descEl = document.getElementById('lab-desc');
-    const hintEl = document.getElementById('lab-hint');
-    const inputEl = document.getElementById('tester-input');
-
-    if(titleEl) titleEl.innerText = getTrans(`${id}_title`, lang);
-    if(descEl) descEl.innerText = getTrans(`${id}_desc`, lang);
-    if(hintEl) hintEl.innerText = getTrans(`${id}_hint`, lang);
-    if(inputEl) inputEl.placeholder = getTrans(`${id}_hint`, lang);
 }
 
 function initLab() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const logic = scenariosLogic[id];
+    const id = params.get('id'); // URL'den ID'yi al (örn: a03)
+    const logic = scenariosLogic[id]; // Mantığı çek
     const lang = localStorage.getItem('lang') || 'tr';
 
+    // Eğer ID yoksa veya geçersizse
     if(!logic) {
         document.getElementById('lab-title').innerText = getTrans('not_found', lang);
+        document.getElementById('lab-desc').innerText = "";
+        document.getElementById('input-area').innerHTML = "";
         return;
     }
 
-    // İlk yüklemede metinleri bas
-    updateLabTexts(id, lang);
+    // Başlıkları Doldur
+    document.getElementById('lab-title').innerText = getTrans(id + '_title', lang);
+    document.getElementById('lab-desc').innerText = getTrans(id + '_desc', lang);
     
-    const inputArea = document.getElementById('input-area');
-    let inputHTML = `<input type="${logic.type}" id="tester-input" placeholder="...">`;
-    
-    // Butonun kendisi de çevrilebilir (data-key var ama JS ile yeniden basıyoruz)
-    const btnText = getTrans('btn_start', lang);
-    inputArea.innerHTML = inputHTML + `<button id="execute-btn" class="btn">${btnText}</button>`;
-    
-    // Placeholder'ı tekrar güncelle (innerHTML sıfırladığı için)
-    updateLabTexts(id, lang);
+    const hintText = getTrans(id + '_hint', lang);
+    document.getElementById('lab-hint').innerText = hintText;
 
+    // Input Alanını Oluştur
+    const inputArea = document.getElementById('input-area');
+    const btnText = getTrans('btn_test', lang);
+    
+    inputArea.innerHTML = `
+        <input type="${logic.type}" id="tester-input" placeholder="${hintText}" style="width:100%; padding:10px; margin-bottom:10px; background:#0f172a; border:1px solid #334155; color:#fff;">
+        <button id="execute-btn" class="btn" style="width:100%;">${btnText}</button>
+    `;
+
+    // Loglama Sistemi
     const logConsole = document.getElementById('console-logs');
     const log = (text, type = 'info') => {
         const entry = document.createElement('div');
@@ -351,14 +226,14 @@ function initLab() {
         logConsole.prepend(entry);
     };
 
+    // Buton Tıklama Olayı
     document.getElementById('execute-btn').addEventListener('click', () => {
         const val = document.getElementById('tester-input').value;
-        log(`Payload: ${val.substring(0, 40)}...`, 'cmd');
+        log(`Payload: ${val}`, 'cmd');
         
         setTimeout(() => {
             const result = logic.handler(val);
-            // Sonucu çeviri tablosundan çek
-            const msg = getTrans(result.k, localStorage.getItem('lang') || 'tr');
+            const msg = getTrans(result.k, lang);
             
             if(result.s) {
                 log(msg, 'success');
@@ -366,6 +241,6 @@ function initLab() {
             } else {
                 log(msg, 'error');
             }
-        }, 400);
+        }, 300);
     });
 }
