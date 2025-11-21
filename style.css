@@ -233,3 +233,23 @@ footer p {
     nav ul { display: none; } /* Mobil menü sonra eklenebilir */
     .test-grid { grid-template-columns: 1fr; }
 }
+/* --- RTL (Arapça) Desteği --- */
+html[dir="rtl"] body {
+    text-align: right;
+    font-family: 'Tahoma', 'Segoe UI', sans-serif; /* Arapça için daha okunaklı fontlar */
+}
+
+html[dir="rtl"] nav ul li {
+    margin-left: 0;
+    margin-right: 30px;
+}
+
+html[dir="rtl"] #language-selector {
+    margin-left: 0;
+    margin-right: 25px;
+}
+
+/* Arapça için başlık altındaki çizgi sağa yaslansın */
+html[dir="rtl"] h2::after {
+    margin-right: 0;
+}
