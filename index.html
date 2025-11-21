@@ -1,390 +1,87 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Security Lab | Offensive & Defensive Testing Playground</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Security Lab: OWASP Top 10, OWASP API Top 10 ve OWASP Automated Threats Top 21 için kapsamlı güvenlik test laboratuvarı."
-  />
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Lab - Web Güvenliği Test Platformu (OWASP)</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="sl-body">
-  <!-- HEADER -->
-  <header class="sl-header">
-    <div class="sl-container sl-header__inner">
-      <a href="index.html" class="sl-brand">
-        <span class="sl-brand__logo">SL</span>
-        <span class="sl-brand__text">
-          <span class="sl-brand__title" data-i18n="brand.title">Security Lab</span>
-          <span class="sl-brand__subtitle" data-i18n="brand.subtitle">
-            Offensive & defensive security test playground
-          </span>
-        </span>
-      </a>
+<body>
 
-      <nav class="sl-nav" aria-label="Primary navigation">
-        <a href="index.html" class="sl-nav__link sl-nav__link--active" data-i18n="nav.home">
-          Ana Sayfa
-        </a>
-        <a href="api-test.html" class="sl-nav__link" data-i18n="nav.apiLab">
-          API Lab
-        </a>
-        <a href="bot-challenge.html" class="sl-nav__link" data-i18n="nav.automatedThreats">
-          Bot & Automated Threats
-        </a>
-        <a href="ai-chat.html" class="sl-nav__link" data-i18n="nav.llmLab">
-          LLM Lab
-        </a>
-      </nav>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo"><a href="index.html">Security Lab</a></div>
+                <ul>
+                    <li><a href="index.html" data-tr="nav-home">Ana Sayfa</a></li>
+                    <li><a href="all-tests.html" data-tr="nav-tests">Tüm Testler</a></li>
+                    </ul>
 
-      <div class="sl-header__right">
-        <div class="sl-lang-switch" aria-label="Dil seçimi">
-          <button type="button" class="sl-lang-switch__btn is-active" data-lang="tr">
-            TR
-          </button>
-          <button type="button" class="sl-lang-switch__btn" data-lang="en">
-            EN
-          </button>
+                <select id="language-selector">
+                    <option value="tr">Türkçe</option>
+                    <option value="en">English</option>
+                </select>
+            </nav>
         </div>
-        <a href="login.html" class="sl-btn sl-btn--ghost" data-i18n="nav.login">Giriş</a>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="sl-main">
-    <!-- HERO -->
-    <section class="sl-section sl-hero">
-      <div class="sl-container sl-hero__inner">
-        <div class="sl-hero__content">
-          <p class="sl-badge" data-i18n="hero.badge">
-            Test et · Kır · Ölç · Güçlendir
-          </p>
-          <h1 class="sl-hero__title" data-i18n="hero.title">
-            Kapsamlı Güvenlik Test Laboratuvarı
-          </h1>
-          <p class="sl-hero__subtitle" data-i18n="hero.subtitle">
-            OWASP Top 10, OWASP API Top 10 ve OWASP Automated Threats Top 21 için
-            izole ve tekrarlanabilir senaryolar. Hem saldırı hem savunma ekibi için
-            tasarlanmış modern bir test playground’u.
-          </p>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 data-tr="hero-title">Web Güvenliği Laboratuvarınıza Hoş Geldiniz.</h1>
+                <p data-tr="hero-subtitle">OWASP Top 10, API Top 10 ve Automated Threats odaklı güncel güvenlik zafiyetlerini keşfedin, anlayın ve test edin.</p>
+                <a href="#test-section" class="btn">Testlere Başla</a>
+            </div>
+        </section>
 
-          <div class="sl-hero__actions">
-            <a href="#quick-tests" class="sl-btn sl-btn--primary" data-i18n="hero.primaryCta">
-              Hızlı saldırı testine başla
-            </a>
-            <a href="#how-it-works" class="sl-btn sl-btn--secondary" data-i18n="hero.secondaryCta">
-              Labı nasıl kullanacaksın?
-            </a>
-          </div>
+        <section id="test-section">
+            <div class="container">
+                <h2 data-tr="section-tests-title">Popüler Güvenlik Testleri</h2>
 
-          <dl class="sl-metrics">
-            <div class="sl-metrics__item">
-              <dt class="sl-metrics__label" data-i18n="metrics.attacksTitle">
-                Saldırı kategorisi
-              </dt>
-              <dd class="sl-metrics__value">40+</dd>
+                <div class="test-grid">
+
+                    <div class="test-card">
+                        <h3 data-tr="card-sql-title">Test SQL Injection</h3>
+                        <p data-tr="card-sql-desc">En sık rastlanan zafiyetlerden birini test edin. Veritabanı sorgularının nasıl manipüle edilebileceğini görün.</p>
+                        <a href="test-sql-injection.html" class="btn" data-tr="card-sql-btn">Testi Başlat</a>
+                    </div>
+
+                    <div class="test-card">
+                        <h3 data-tr="card-xss-title">Test XSS (Cross-Site Scripting)</h3>
+                        <p data-tr="card-xss-desc">Kötü amaçlı istemci tarafı betiklerin bir kullanıcıya nasıl enjekte edilebileceğini keşfedin.</p>
+                        <a href="test-xss.html" class="btn" data-tr="card-xss-btn">Testi Başlat</a>
+                    </div>
+
+                    <div class="test-card">
+                        <h3 data-tr="card-ldap-title">Test LDAP Injection</h3>
+                        <p data-tr="card-ldap-desc">Dizin hizmetlerine (LDAP) yapılan sorgularda yetkilendirme ve kimlik doğrulama zafiyetlerini gözlemleyin.</p>
+                        <a href="test-ldap-injection.html" class="btn" data-tr="card-ldap-btn">Testi Başlat</a>
+                    </div>
+
+                    <div class="test-card">
+                        <h3 data-tr="card-payment-title">API Testi: Ödeme İşlemi</h3>
+                        <p data-tr="card-payment-desc">API güvenliği zafiyetlerini (Örn: BOLA) test etmek için tasarlanmış sahte ödeme işlemini gözden geçirin.</p>
+                        <a href="api-test-payment.html" class="btn" data-tr="card-payment-btn">Ödeme Sayfasına Git</a>
+                    </div>
+
+                    <div class="test-card">
+                        <h3 data-tr="card-brute-title">Test Brute Force</h3>
+                        <p data-tr="card-brute-desc">Kimlik doğrulama mekanizmalarının parola denemelerine karşı ne kadar dayanıklı olduğunu ölçün.</p>
+                        <a href="test-brute-force.html" class="btn" data-tr="card-brute-btn">Testi Başlat</a>
+                    </div>
+
+                    </div>
             </div>
-            <div class="sl-metrics__item">
-              <dt class="sl-metrics__label" data-i18n="metrics.pagesTitle">
-                Test sayfası
-              </dt>
-              <dd class="sl-metrics__value">30+</dd>
-            </div>
-            <div class="sl-metrics__item">
-              <dt class="sl-metrics__label" data-i18n="metrics.modesTitle">
-                Mod
-              </dt>
-              <dd class="sl-metrics__value" data-i18n="metrics.modesValue">
-                Manual · Scripted · Bot
-              </dd>
-            </div>
-          </dl>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p data-tr="footer-text">© 2025 Security Lab. Eğitim ve Test Amaçlıdır.</p>
         </div>
+    </footer>
 
-        <aside class="sl-hero__panel" aria-labelledby="hero-panel-title">
-          <h2 id="hero-panel-title" class="sl-panel__title" data-i18n="hero.panelTitle">
-            OWASP odaklı saldırı kütüphanesi
-          </h2>
-          <ul class="sl-panel__list">
-            <li class="sl-panel__item">
-              <div class="sl-panel__item-badge">A</div>
-              <div>
-                <div class="sl-panel__item-title" data-i18n="hero.pillar.webTitle">
-                  OWASP Top 10 (Web)
-                </div>
-                <div class="sl-panel__item-text" data-i18n="hero.pillar.webDesc">
-                  Injection, Broken Access Control, SSRF, Security Misconfiguration ve daha fazlası için hazır senaryolar.
-                </div>
-              </div>
-            </li>
-            <li class="sl-panel__item">
-              <div class="sl-panel__item-badge">API</div>
-              <div>
-                <div class="sl-panel__item-title" data-i18n="hero.pillar.apiTitle">
-                  OWASP API Top 10
-                </div>
-                <div class="sl-panel__item-text" data-i18n="hero.pillar.apiDesc">
-                  Aşırı veri ifşası, rate limit zafiyetleri, yetkilendirme hataları için gerçekçi API akışları.
-                </div>
-              </div>
-            </li>
-            <li class="sl-panel__item">
-              <div class="sl-panel__item-badge">BOT</div>
-              <div>
-                <div class="sl-panel__item-title" data-i18n="hero.pillar.autoTitle">
-                  Automated Threats Top 21
-                </div>
-                <div class="sl-panel__item-text" data-i18n="hero.pillar.autoDesc">
-                  Credential stuffing, card testing, scraping, scalping gibi bot saldırılarını simüle et.
-                </div>
-              </div>
-            </li>
-          </ul>
-          <p class="sl-panel__footnote" data-i18n="hero.panelFootnote">
-            Bu sayfa, tüm alt sayfalar için referans şablondur. Aynı başlık yapısını diğer
-            OWASP sayfalarına kopyalayarak tutarlı bir deneyim sağlayabilirsin.
-          </p>
-        </aside>
-      </div>
-    </section>
+    <script src="script.js"></script>
 
-    <!-- QUICK TESTS + CONSOLE -->
-    <section id="quick-tests" class="sl-section">
-      <div class="sl-container">
-        <header class="sl-section__header">
-          <h2 class="sl-section__title" data-i18n="quick.title">
-            Hızlı saldırı testleri
-          </h2>
-          <p class="sl-section__subtitle" data-i18n="quick.subtitle">
-            Aşağıdaki butonlar, OWASP senaryolarına karşılık gelen saldırı akışlarını
-            simüle eder. Sol taraftan testi başlat, sağ taraftaki konsoldan ne olduğunu
-            adım adım izle.
-          </p>
-        </header>
-
-        <div class="sl-layout">
-          <div class="sl-layout__left">
-            <div class="sl-card-grid">
-              <article class="sl-card sl-card--attack">
-                <h3 class="sl-card__title" data-i18n="quick.sql.title">
-                  SQL Injection (OWASP A03:2021)
-                </h3>
-                <p class="sl-card__text" data-i18n="quick.sql.desc">
-                  Zayıf giriş doğrulamasına sahip bir login isteği üzerinden klasik
-                  `' OR 1=1 --` saldırısını simüle eder.
-                </p>
-                <button
-                  id="btn-sql-injection"
-                  class="sl-btn sl-btn--primary sl-btn--full"
-                  type="button"
-                  data-i18n="buttons.sql"
-                >
-                  SQL Injection testini başlat
-                </button>
-              </article>
-
-              <article class="sl-card sl-card--attack">
-                <h3 class="sl-card__title" data-i18n="quick.xss.title">
-                  XSS (Stored / Reflected)
-                </h3>
-                <p class="sl-card__text" data-i18n="quick.xss.desc">
-                  Güvenli olmayan yorum alanı üzerinden script içeren yüklerin nasıl
-                  işlendiğini simüle eder.
-                </p>
-                <button
-                  id="btn-xss"
-                  class="sl-btn sl-btn--primary sl-btn--full"
-                  type="button"
-                  data-i18n="buttons.xss"
-                >
-                  XSS testini başlat
-                </button>
-              </article>
-
-              <article class="sl-card sl-card--attack">
-                <h3 class="sl-card__title" data-i18n="quick.ldap.title">
-                  LDAP Injection
-                </h3>
-                <p class="sl-card__text" data-i18n="quick.ldap.desc">
-                  Zayıf LDAP filtresi kullanan dizin sorgusunu hedef alan saldırıyı
-                  gösterir.
-                </p>
-                <button
-                  id="btn-ldap"
-                  class="sl-btn sl-btn--primary sl-btn--full"
-                  type="button"
-                  data-i18n="buttons.ldap"
-                >
-                  LDAP Injection testini başlat
-                </button>
-              </article>
-
-              <article class="sl-card sl-card--attack">
-                <h3 class="sl-card__title" data-i18n="quick.payment.title">
-                  Ödeme & Card Testing (OAT-001)
-                </h3>
-                <p class="sl-card__text" data-i18n="quick.payment.desc">
-                  Test kartı üzerinden card testing benzeri isteklerin davranışını
-                  simüle eder. Gerçek ödeme yapılmaz.
-                </p>
-                <button
-                  id="btn-payment"
-                  class="sl-btn sl-btn--primary sl-btn--full"
-                  type="button"
-                  data-i18n="buttons.payment"
-                >
-                  Ödeme akışı testini başlat
-                </button>
-              </article>
-
-              <article class="sl-card sl-card--attack">
-                <h3 class="sl-card__title" data-i18n="quick.bruteforce.title">
-                  Brute Force / Credential Stuffing (OAT-007 / OAT-008)
-                </h3>
-                <p class="sl-card__text" data-i18n="quick.bruteforce.desc">
-                  Zayıf rate limit ve hesap kilitleme politikalarının etkisini görmek
-                  için basit bir brute force denemesi simüle eder.
-                </p>
-                <button
-                  id="btn-bruteforce"
-                  class="sl-btn sl-btn--primary sl-btn--full"
-                  type="button"
-                  data-i18n="buttons.bruteforce"
-                >
-                  Brute force testini başlat
-                </button>
-              </article>
-            </div>
-          </div>
-
-          <aside class="sl-layout__right">
-            <div class="sl-card sl-card--console" aria-live="polite">
-              <header class="sl-console__header">
-                <div>
-                  <div
-                    class="sl-console__title"
-                    data-i18n="console.title"
-                  >
-                    Saldırı simülasyon konsolu
-                  </div>
-                  <div class="sl-console__subtitle" data-i18n="console.subtitle">
-                    Butonlardan bir senaryo seç; burada adım adım neler olduğunu izle.
-                  </div>
-                </div>
-                <div class="sl-console__meta">
-                  <span
-                    id="console-status"
-                    class="sl-console__status"
-                    data-i18n="console.idle"
-                  >
-                    Hazır
-                  </span>
-                  <span class="sl-console__dot">•</span>
-                  <span
-                    id="console-scenario"
-                    class="sl-console__scenario"
-                  >
-                    -
-                  </span>
-                </div>
-              </header>
-
-              <pre
-                id="console-output"
-                class="sl-console__log"
-                data-i18n="console.empty"
-              >Henüz bir test seçilmedi. Soldan bir senaryo başlat.</pre>
-
-              <div class="sl-console__actions">
-                <button
-                  id="btn-clear-console"
-                  type="button"
-                  class="sl-btn sl-btn--ghost sl-btn--sm"
-                  data-i18n="buttons.clearConsole"
-                >
-                  Konsolu temizle
-                </button>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS / GUIDELINES -->
-    <section id="how-it-works" class="sl-section sl-section--muted">
-      <div class="sl-container">
-        <header class="sl-section__header sl-section__header--center">
-          <h2 class="sl-section__title" data-i18n="how.title">
-            Bu labı nasıl kullanacaksın?
-          </h2>
-          <p class="sl-section__subtitle" data-i18n="how.subtitle">
-            Bu yapı, OWASP Top 10, OWASP API Top 10 ve OWASP Automated Threats Top 21
-            için tek tip bir çerçeve sunar. Her bir alt sayfa, aynı akış ve tasarımı
-            takip ederek öğrenme ve test süreçlerini hızlandırır.
-          </p>
-        </header>
-
-        <div class="sl-steps">
-          <article class="sl-step">
-            <div class="sl-step__index">1</div>
-            <h3 class="sl-step__title" data-i18n="how.step1.title">
-              Hedef OWASP başlığını seç
-            </h3>
-            <p class="sl-step__text" data-i18n="how.step1.desc">
-              Ana menüden (Web / API / Automated Threats) ilgili başlığı seç ve o
-              zafiyete özel sayfaya git. Her sayfada risk açıklaması, gereklilikler
-              ve test adımları aynı formatta sunulur.
-            </p>
-          </article>
-
-          <article class="sl-step">
-            <div class="sl-step__index">2</div>
-            <h3 class="sl-step__title" data-i18n="how.step2.title">
-              Senaryoyu oku, testi başlat
-            </h3>
-            <p class="sl-step__text" data-i18n="how.step2.desc">
-              Sayfadaki açıklamaları oku, ardından ilgili test butonlarına tıklayarak
-              simülasyonu başlat. Konsoldaki log’lar üzerinden WAF, CDN veya güvenlik
-              ürünlerinin davranışını gözlemle.
-            </p>
-          </article>
-
-          <article class="sl-step">
-            <div class="sl-step__index">3</div>
-            <h3 class="sl-step__title" data-i18n="how.step3.title">
-              Ölç, iyileştir, yeniden dene
-            </h3>
-            <p class="sl-step__text" data-i18n="how.step3.desc">
-              Korumayı güncelledikten sonra aynı senaryoyu yeniden çalıştır. Böylece
-              hem kırmızı ekip (offensive) hem mavi ekip (defensive) için tekrarlanabilir
-              bir benchmark elde etmiş olursun.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="sl-footer">
-    <div class="sl-container sl-footer__inner">
-      <div class="sl-footer__left">
-        <div class="sl-footer__brand">SL</div>
-        <p class="sl-footer__text" data-i18n="footer.disclaimer">
-          Bu uygulama bilerek zafiyet içerecek şekilde tasarlanmıştır. Sadece izole
-          laboratuvar ortamlarında, eğitim ve güvenlik testi amacıyla kullanılmalıdır.
-        </p>
-      </div>
-      <p class="sl-footer__warning" data-i18n="footer.warning">
-        Üretim ortamına deploy ETME. Gerçek müşteri verisi veya gerçek ödeme bilgisi
-        kullanma.
-      </p>
-    </div>
-  </footer>
-
-  <script src="js/main.js" defer></script>
 </body>
 </html>
