@@ -1,0 +1,200 @@
+/*
+    Modern Siber Güvenlik Teması:
+    Palette: #1e1e1e (Arkaplan), #2b2b2b (Bileşen Arkaplanı), #00bcd4 (Vurgu/Link/Buton), #ffffff (Yazı)
+    Font: Sans-serif (Okunabilirlik)
+*/
+
+:root {
+    --color-bg-primary: #121212; /* Çok Koyu Arkaplan */
+    --color-bg-secondary: #1e1e1e; /* Bileşen Arkaplanı */
+    --color-accent: #00bcd4; /* Vurgu Rengi (Mavi-Turkuaz) */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #aaaaaa;
+    --color-border: #333333;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- Header & Navigasyon (Pazarlama Algısı İçin Geniş ve Net) --- */
+header {
+    background: var(--color-bg-secondary);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo a {
+    color: var(--color-accent);
+    font-size: 1.8em;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: var(--color-accent);
+}
+
+/* Dil Seçimi Kutusu */
+#language-selector {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 20px;
+}
+
+
+/* --- Ana İçerik ve Bileşenler --- */
+section {
+    padding: 60px 0;
+}
+
+h1, h2, h3 {
+    color: var(--color-text-primary);
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 2.2em;
+    border-bottom: 2px solid var(--color-accent);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+/* Ana Başlık Alanı (Hero Section) - Pazarlama Odaklı */
+.hero {
+    background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.9)), url('path/to/security-image.jpg'); /* Arkaplan görsel yolu eklenebilir */
+    background-size: cover;
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.hero h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    color: var(--color-accent);
+}
+
+.hero p {
+    font-size: 1.2em;
+    color: var(--color-text-secondary);
+    margin-bottom: 30px;
+}
+
+/* Kartlar/Test Butonları (Siber Güvenlik Odaklı) */
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.test-card {
+    background-color: var(--color-bg-secondary);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6), 0 0 15px var(--color-accent);
+}
+
+.test-card h3 {
+    color: var(--color-accent);
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.test-card p {
+    color: var(--color-text-secondary);
+    margin-bottom: 20px;
+    min-height: 80px; /* Görsel Bütünlük */
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--color-accent);
+    color: var(--color-bg-primary);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #008c99; /* Vurgu Renginin Koyu Tonu */
+}
+
+/* --- Footer --- */
+footer {
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: 40px;
+}
+
+footer p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+    nav ul {
+        display: none; /* Basitlik için mobil menü kapatıldı, JS ile açılabilir */
+    }
+
+    .hero h1 {
+        font-size: 2.5em;
+    }
+}
