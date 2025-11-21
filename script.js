@@ -1,486 +1,138 @@
-(function () {
-  const STORAGE_KEY = "securityLabLang";
-  const SUPPORTED_LANGS = ["tr", "en"];
-  const DEFAULT_LANG = "tr";
-
-  // ---- TRANSLATIONS ----
-  const translations = {
+// Dil Veritabanı (Sözlük)
+const translations = {
     tr: {
-      "brand.title": "Security Lab",
-      "brand.subtitle": "Offensive & defensive security test playground",
-
-      "nav.home": "Ana Sayfa",
-      "nav.apiLab": "API Lab",
-      "nav.automatedThreats": "Bot & Automated Threats",
-      "nav.llmLab": "LLM Lab",
-      "nav.login": "Giriş",
-
-      "hero.badge": "Test et · Kır · Ölç · Güçlendir",
-      "hero.title": "Kapsamlı Güvenlik Test Laboratuvarı",
-      "hero.subtitle":
-        "OWASP Top 10, OWASP API Top 10 ve OWASP Automated Threats Top 21 için izole, tekrarlanabilir ve pazarlama dostu bir test ortamı.",
-      "hero.primaryCta": "Hızlı saldırı testine başla",
-      "hero.secondaryCta": "Labı nasıl kullanacaksın?",
-      "hero.panelTitle": "OWASP odaklı saldırı kütüphanesi",
-      "hero.pillar.webTitle": "OWASP Top 10 (Web)",
-      "hero.pillar.webDesc":
-        "Injection, Broken Access Control, SSRF, Security Misconfiguration ve diğer çekirdek zafiyetler.",
-      "hero.pillar.apiTitle": "OWASP API Top 10",
-      "hero.pillar.apiDesc":
-        "Aşırı veri ifşası, zayıf yetkilendirme, rate limit eksikliği gibi API odaklı riskler.",
-      "hero.pillar.autoTitle": "Automated Threats Top 21",
-      "hero.pillar.autoDesc":
-        "Credential stuffing, card testing, scraping, scalping ve diğer bot saldırıları.",
-      "hero.panelFootnote":
-        "Bu sayfa, tüm OWASP başlıkları için kullanılacak şablondur. Aynı yapı diğer sayfalara kopyalanarak tutarlı deneyim sağlanır.",
-
-      "metrics.attacksTitle": "Saldırı kategorisi",
-      "metrics.pagesTitle": "Test sayfası",
-      "metrics.modesTitle": "Mod",
-      "metrics.modesValue": "Manual · Scripted · Bot",
-
-      "quick.title": "Hızlı saldırı testleri",
-      "quick.subtitle":
-        "Butonlara tıkladığında, gerçek saldırı mantığını temsil eden bir akış konsolda gösterilir. Bu akış, WAF/CDN/sigorta gibi güvenlik katmanlarını test etmek için kullanılabilir.",
-      "quick.sql.title": "SQL Injection (OWASP A03:2021)",
-      "quick.sql.desc":
-        "Zayıf login sorgusu üzerinden klasik SQL Injection akışını simüle eder; WAF ve input validation davranışını gözlemle.",
-      "quick.xss.title": "XSS (Stored / Reflected)",
-      "quick.xss.desc":
-        "Script içeren kullanıcı girdisinin nasıl işlendiğini gösterir. Tarayıcı tarafında neler olacağını adım adım loglar.",
-      "quick.ldap.title": "LDAP Injection",
-      "quick.ldap.desc":
-        "Zayıf LDAP filtresi kullanan dizin sorgularında nasıl yetkisiz erişime gidilebileceğini simüle eder.",
-      "quick.payment.title": "Ödeme & Card Testing (OAT-001)",
-      "quick.payment.desc":
-        "Test kartı ile gerçekleştirilen, card testing benzeri yoğun denemeleri temsil eder. Gerçek ödeme yapılmaz.",
-      "quick.bruteforce.title":
-        "Brute Force / Credential Stuffing (OAT-007 / OAT-008)",
-      "quick.bruteforce.desc":
-        "Rate limit ve hesap kilitleme politikalarının zayıflığını ortaya çıkaran kaba kuvvet denemelerini simüle eder.",
-
-      "buttons.sql": "SQL Injection testini başlat",
-      "buttons.xss": "XSS testini başlat",
-      "buttons.ldap": "LDAP Injection testini başlat",
-      "buttons.payment": "Ödeme akışı testini başlat",
-      "buttons.bruteforce": "Brute force testini başlat",
-      "buttons.clearConsole": "Konsolu temizle",
-
-      "scenario.sql.name": "SQL Injection",
-      "scenario.xss.name": "XSS",
-      "scenario.ldap.name": "LDAP Injection",
-      "scenario.payment.name": "Ödeme / Card Testing",
-      "scenario.bruteforce.name": "Brute Force / Credential Stuffing",
-
-      "console.title": "Saldırı simülasyon konsolu",
-      "console.subtitle":
-        "Butonlardan bir senaryo seç; burada adım adım neler olduğunu izle.",
-      "console.idle": "Hazır",
-      "console.running": "Çalışıyor...",
-      "console.done": "Tamamlandı.",
-      "console.empty":
-        "Henüz bir test seçilmedi. Soldan bir senaryo başlat.",
-      "console.noScript":
-        "Bu senaryo için henüz detaylı bir demo eklenmedi.",
-
-      "how.title": "Bu labı nasıl kullanacaksın?",
-      "how.subtitle":
-        "Tüm OWASP başlıkları için aynı yapıyı kullanarak hem eğitim hem de pazarlama açısından anlatımı sade, tutarlı ve ikna edici kıl.",
-      "how.step1.title": "Hedef OWASP başlığını seç",
-      "how.step1.desc":
-        "Menüden Web, API veya Automated Threats kategorisini seç ve ilgili OWASP maddesine giden alt sayfaya ilerle.",
-      "how.step2.title": "Senaryoyu oku, testi başlat",
-      "how.step2.desc":
-        "Sayfadaki risk ve iş etkisi açıklamalarını incele; ardından butonlara tıklayarak simülasyonu çalıştır ve davranışı gözle.",
-      "how.step3.title": "Ölç, iyileştir, yeniden dene",
-      "how.step3.desc":
-        "Güvenlik kontrollerini güncelledikten sonra aynı saldırıyı tekrar çalıştır; böylece bir önceki durumla kıyaslama yapabilirsin.",
-
-      "footer.disclaimer":
-        "Bu uygulama bilerek zafiyet içerecek şekilde tasarlanmıştır. Sadece izole laboratuvar ortamlarında, eğitim ve güvenlik testi amacıyla kullanılmalıdır.",
-      "footer.warning":
-        "Üretim ortamına deploy ETME. Gerçek müşteri verisi veya gerçek ödeme bilgisi kullanma."
-    },
-
-    en: {
-      "brand.title": "Security Lab",
-      "brand.subtitle": "Offensive & defensive security test playground",
-
-      "nav.home": "Home",
-      "nav.apiLab": "API Lab",
-      "nav.automatedThreats": "Bot & Automated Threats",
-      "nav.llmLab": "LLM Lab",
-      "nav.login": "Login",
-
-      "hero.badge": "Test · Break · Measure · Harden",
-      "hero.title": "Comprehensive Security Testing Lab",
-      "hero.subtitle":
-        "Isolated, repeatable scenarios for OWASP Top 10, OWASP API Top 10 and OWASP Automated Threats Top 21. Designed for both red and blue teams.",
-      "hero.primaryCta": "Start quick attack test",
-      "hero.secondaryCta": "How to use this lab?",
-      "hero.panelTitle": "OWASP-driven attack library",
-      "hero.pillar.webTitle": "OWASP Top 10 (Web)",
-      "hero.pillar.webDesc":
-        "Injection, Broken Access Control, SSRF, Security Misconfiguration and other core risks.",
-      "hero.pillar.apiTitle": "OWASP API Top 10",
-      "hero.pillar.apiDesc":
-        "API-specific risks such as excessive data exposure, broken object level authorization and missing rate limiting.",
-      "hero.pillar.autoTitle": "Automated Threats Top 21",
-      "hero.pillar.autoDesc":
-        "Simulate credential stuffing, card testing, scraping, scalping and other bot-driven attacks.",
-      "hero.panelFootnote":
-        "This page acts as the reference layout for all OWASP detail pages. Copy the structure to each subpage for a consistent experience.",
-
-      "metrics.attacksTitle": "Attack categories",
-      "metrics.pagesTitle": "Test pages",
-      "metrics.modesTitle": "Modes",
-      "metrics.modesValue": "Manual · Scripted · Bot",
-
-      "quick.title": "Quick attack tests",
-      "quick.subtitle":
-        "Each button triggers a realistic attack flow in the console. Use these flows to test WAF, CDN and security stack behaviour.",
-      "quick.sql.title": "SQL Injection (OWASP A03:2021)",
-      "quick.sql.desc":
-        "Simulates a classic SQL Injection against a weak login query to observe WAF and validation behaviour.",
-      "quick.xss.title": "XSS (Stored / Reflected)",
-      "quick.xss.desc":
-        "Shows how script-heavy user input is processed and what would happen in the victim’s browser.",
-      "quick.ldap.title": "LDAP Injection",
-      "quick.ldap.desc":
-        "Simulates abuse of weak LDAP filters in directory lookup flows.",
-      "quick.payment.title": "Payment & Card Testing (OAT-001)",
-      "quick.payment.desc":
-        "Represents high-volume test-card attempts similar to card testing activity. No real payment is executed.",
-      "quick.bruteforce.title":
-        "Brute Force / Credential Stuffing (OAT-007 / OAT-008)",
-      "quick.bruteforce.desc":
-        "Simulates repeated login attempts to reveal missing rate limiting and account lockout controls.",
-
-      "buttons.sql": "Run SQL Injection test",
-      "buttons.xss": "Run XSS test",
-      "buttons.ldap": "Run LDAP Injection test",
-      "buttons.payment": "Run payment flow test",
-      "buttons.bruteforce": "Run brute force test",
-      "buttons.clearConsole": "Clear console",
-
-      "scenario.sql.name": "SQL Injection",
-      "scenario.xss.name": "XSS",
-      "scenario.ldap.name": "LDAP Injection",
-      "scenario.payment.name": "Payment / Card Testing",
-      "scenario.bruteforce.name": "Brute Force / Credential Stuffing",
-
-      "console.title": "Attack simulation console",
-      "console.subtitle":
-        "Pick a scenario on the left and follow each step here.",
-      "console.idle": "Idle",
-      "console.running": "Running...",
-      "console.done": "Completed.",
-      "console.empty": "No test selected yet. Start a scenario on the left.",
-      "console.noScript":
-        "No detailed script has been added for this scenario yet.",
-
-      "how.title": "How to use this lab?",
-      "how.subtitle":
-        "Use a consistent structure across all OWASP items so both security teams and stakeholders easily understand risk, impact and controls.",
-      "how.step1.title": "Pick the target OWASP item",
-      "how.step1.desc":
-        "From the navigation, choose Web, API or Automated Threats and then drill down into the specific OWASP entry.",
-      "how.step2.title": "Read the scenario, then run the test",
-      "how.step2.desc":
-        "Review risk and business impact description, then trigger the simulation and observe the stack behaviour.",
-      "how.step3.title": "Measure, improve, re-run",
-      "how.step3.desc":
-        "After tuning your controls, re-run the same scenario to demonstrate before/after behaviour.",
-
-      "footer.disclaimer":
-        "This application is intentionally vulnerable. Use it only in isolated lab environments for education and security testing.",
-      "footer.warning":
-        "Do NOT deploy to production. Do not use real customer data or real payment information."
-    }
-  };
-
-  // ---- TEST LOG SCRIPTS (SIMULATION ONLY) ----
-  const testLogs = {
-    tr: {
-      sql: [
-        "[client] /api/login endpoint’ine istek hazırlanıyor...",
-        "[payload] username=admin' OR 1=1 --  &  password= herhangi bir değer",
-        "[server] Girdi doğrudan SQL sorgusuna ekleniyor:",
-        "         SELECT * FROM users WHERE username = 'admin' OR 1=1 -- ' AND password = '***'",
-        "[effect] WHERE koşulu her zaman TRUE. Tüm kullanıcılar dönüyor → kimlik doğrulama atlandı.",
-        "[waf] Bu pattern 'OR 1=1 --' WAF tarafından tespit edilip engellenmeliydi.",
-        "[mitigation] Hazırlanmış ifadeler (prepared statement), parametreli sorgular ve bağlam bazlı input validation kullan."
-      ],
-      xss: [
-        "[client] /comments endpoint’ine yorum gönderiliyor...",
-        '[payload] <script>alert(\"xss\")</script>',
-        "[server] Yorum, output encoding yapılmadan veritabanına kaydediliyor.",
-        "[victim] Başka bir kullanıcı sayfayı açtığında script tarayıcıda çalışıyor.",
-        "[impact] Session çalma, DOM manipülasyonu, keylogger vb. saldırılar mümkün.",
-        "[mitigation] Çıkışta HTML encode et, güvenli şablon motoru kullan, Content Security Policy (CSP) uygula."
-      ],
-      ldap: [
-        "[client] /directory/search için kullanıcılara ait kayıt aranıyor...",
-        "[payload] (uid=admin)(|(uid=*)))",
-        "[server] Filtre string’i direkt olarak LDAP sorgusuna gömülüyor:",
-        "         (&(objectClass=user)(uid=admin)(|(uid=*))))",
-        "[effect] Saldırgan ek filtreler ekleyerek yetkisiz tüm kayıtları listeleyebiliyor.",
-        "[mitigation] LDAP filtrelerini güvenli builder ile oluştur, kullanıcı girdisini kaçışla, allow-list yaklaşımı kullan."
-      ],
-      payment: [
-        "[client] /payment/charge endpoint’ine test kartı ile istek atılıyor...",
-        "[info] Kullanılan kart numarası sadece lab ortamı içindir: 4111 1111 1111 1111",
-        "[pattern] Ardışık binlerce küçük tutarlı deneme → card testing davranışı.",
-        "[server] Rate limit zayıf veya yok; aynı IP ve kart pattern’leri engellenmiyor.",
-        "[impact] Gerçek sistemlerde fraud maliyeti ve işlem ücreti kaybı oluşur.",
-        "[mitigation] Velocity limit, device fingerprinting, bin kontrolleri ve 3DS gibi ilave güvenlik adımları uygula."
-      ],
-      bruteforce: [
-        "[client] /login endpoint’ine ardışık giriş denemeleri yapılıyor...",
-        "[pattern] Kullanıcı adı sabit, parola listesi sözlük dosyasından çekiliyor.",
-        "[server] Başarısız giriş sayısına rağmen hesap kilitlenmiyor.",
-        "[effect] Zayıf parola kombinasyonları kısa sürede tahmin edilebiliyor.",
-        "[mitigation] Hesap kilitleme politikası, artan gecikme (progressive delay) ve IP bazlı rate limit uygula."
-      ]
+        nav_home: "Ana Sayfa",
+        nav_tests: "Tüm Testler",
+        nav_about: "Hakkında",
+        hero_title: "Web Güvenliği Laboratuvarı",
+        hero_subtitle: "OWASP Top 10, API güvenliği ve otomatik tehditleri test etmek için geliştirilmiş modern simülasyon ortamı.",
+        hero_btn: "Testlere Başla",
+        section_tests_title: "Popüler Güvenlik Testleri",
+        card_sql_title: "Test SQL Injection",
+        card_sql_desc: "Veritabanı sorgularını manipüle ederek yetkisiz veri erişimini test edin.",
+        card_xss_title: "Test XSS (Cross-Site Scripting)",
+        card_xss_desc: "Tarayıcı tabanlı saldırıları ve zararlı script enjeksiyonlarını simüle edin.",
+        card_ldap_title: "Test LDAP Injection",
+        card_ldap_desc: "Dizin hizmetlerine yapılan yetkisiz sorgu manipülasyonlarını inceleyin.",
+        card_api_title: "API: Ödeme Manipülasyonu",
+        card_api_desc: "API endpointlerindeki veri bütünlüğü ve parametre manipülasyonu açıklarını test edin.",
+        card_brute_title: "Test Brute Force",
+        card_brute_desc: "Giriş mekanizmalarının kaba kuvvet saldırılarına karşı direncini ölçün.",
+        btn_start: "Testi Başlat",
+        btn_payment: "Ödeme Yap",
+        footer_text: "© 2025 Security Lab. Sadece eğitim ve yasal test amaçlıdır."
     },
     en: {
-      sql: [
-        "[client] Preparing request to /api/login ...",
-        "[payload] username=admin' OR 1=1 --  &  password= any value",
-        "[server] Input is concatenated directly into the SQL query:",
-        "         SELECT * FROM users WHERE username = 'admin' OR 1=1 -- ' AND password = '***'",
-        "[effect] WHERE condition is always TRUE. All users returned → authentication bypass.",
-        "[waf] Pattern 'OR 1=1 --' should be detected and blocked by WAF.",
-        "[mitigation] Use prepared statements, parameterised queries and context-aware input validation."
-      ],
-      xss: [
-        "[client] Sending comment to /comments endpoint ...",
-        '[payload] <script>alert(\"xss\")</script>',
-        "[server] Comment is stored without proper output encoding.",
-        "[victim] When another user loads the page, the script executes in their browser.",
-        "[impact] Session hijacking, DOM manipulation, keylogging and other attacks become possible.",
-        "[mitigation] HTML-encode output, use a safe template engine and enforce Content Security Policy (CSP)."
-      ],
-      ldap: [
-        "[client] Performing directory lookup via /directory/search ...",
-        "[payload] (uid=admin)(|(uid=*)))",
-        "[server] Filter string is injected directly into the LDAP query:",
-        "         (&(objectClass=user)(uid=admin)(|(uid*))))",
-        "[effect] Attacker can extend the filter and retrieve unauthorised records.",
-        "[mitigation] Build LDAP filters via safe builders, escape user input and prefer allow-lists."
-      ],
-      payment: [
-        "[client] Sending payment request to /payment/charge using a test card...",
-        "[info] Card number is lab-only test data: 4111 1111 1111 1111",
-        "[pattern] Thousands of low-amount attempts in sequence → card testing behaviour.",
-        "[server] Weak or no rate limiting; repeated IP/card patterns are not blocked.",
-        "[impact] On real systems this leads to fraud losses and processing fee costs.",
-        "[mitigation] Apply velocity limits, device fingerprinting, BIN checks and additional controls such as 3DS."
-      ],
-      bruteforce: [
-        "[client] Performing repeated login attempts to /login ...",
-        "[pattern] Username is fixed, password list comes from a dictionary file.",
-        "[server] Account is not locked despite many failed attempts.",
-        "[effect] Weak password combinations are eventually guessed.",
-        "[mitigation] Enforce account lockout policies, progressive delays and IP-based rate limiting."
-      ]
+        nav_home: "Home",
+        nav_tests: "All Tests",
+        nav_about: "About",
+        hero_title: "Web Security Laboratory",
+        hero_subtitle: "A modern simulation environment designed to test OWASP Top 10, API security, and automated threats.",
+        hero_btn: "Start Testing",
+        section_tests_title: "Popular Security Tests",
+        card_sql_title: "Test SQL Injection",
+        card_sql_desc: "Test unauthorized data access by manipulating database queries.",
+        card_xss_title: "Test XSS (Cross-Site Scripting)",
+        card_xss_desc: "Simulate browser-based attacks and malicious script injections.",
+        card_ldap_title: "Test LDAP Injection",
+        card_ldap_desc: "Examine unauthorized query manipulations on directory services.",
+        card_api_title: "API: Payment Manipulation",
+        card_api_desc: "Test data integrity and parameter manipulation vulnerabilities in API endpoints.",
+        card_brute_title: "Test Brute Force",
+        card_brute_desc: "Measure the resistance of login mechanisms against brute force attacks.",
+        btn_start: "Start Test",
+        btn_payment: "Make Payment",
+        footer_text: "© 2025 Security Lab. For educational and legal testing purposes only."
+    },
+    fr: {
+        nav_home: "Accueil",
+        nav_tests: "Tous les Tests",
+        nav_about: "À propos",
+        hero_title: "Laboratoire de Sécurité Web",
+        hero_subtitle: "Un environnement de simulation moderne conçu pour tester l'OWASP Top 10, la sécurité des API et les menaces automatisées.",
+        hero_btn: "Commencer les Tests",
+        section_tests_title: "Tests de Sécurité Populaires",
+        card_sql_title: "Test Injection SQL",
+        card_sql_desc: "Testez l'accès non autorisé aux données en manipulant les requêtes de base de données.",
+        card_xss_title: "Test XSS (Cross-Site Scripting)",
+        card_xss_desc: "Simulez des attaques par navigateur et des injections de scripts malveillants.",
+        card_ldap_title: "Test Injection LDAP",
+        card_ldap_desc: "Examinez les manipulations de requêtes non autorisées sur les services d'annuaire.",
+        card_api_title: "API: Manipulation de Paiement",
+        card_api_desc: "Testez l'intégrité des données et les vulnérabilités de manipulation de paramètres.",
+        card_brute_title: "Test Brute Force",
+        card_brute_desc: "Mesurez la résistance des mécanismes de connexion contre les attaques par force brute.",
+        btn_start: "Démarrer le Test",
+        btn_payment: "Effectuer le Paiement",
+        footer_text: "© 2025 Security Lab. À des fins éducatives et de tests légaux uniquement."
+    },
+    ar: {
+        nav_home: "الرئيسية",
+        nav_tests: "جميع الاختبارات",
+        nav_about: "حول",
+        hero_title: "مختبر أمان الويب",
+        hero_subtitle: "بيئة محاكاة حديثة مصممة لاختبار OWASP Top 10 وأمان API والتهديدات الآلية.",
+        hero_btn: "بدء الاختبارات",
+        section_tests_title: "اختبارات الأمان الشائعة",
+        card_sql_title: "اختبار حقن SQL",
+        card_sql_desc: "اختبار الوصول غير المصرح به للبيانات عن طريق التلاعب في استعلامات قاعدة البيانات.",
+        card_xss_title: "اختبار XSS (برمجة عبر المواقع)",
+        card_xss_desc: "محاكاة الهجمات المستندة إلى المتصفح وحقن النصوص البرمجية الضارة.",
+        card_ldap_title: "اختبار حقن LDAP",
+        card_ldap_desc: "فحص تلاعب الاستعلام غير المصرح به على خدمات الدليل.",
+        card_api_title: "API: التلاعب بالدفع",
+        card_api_desc: "اختبار سلامة البيانات وثغرات التلاعب في المعاملات عبر نقاط اتصال API.",
+        card_brute_title: "اختبار الهجوم الشامل (Brute Force)",
+        card_brute_desc: "قياس مقاومة آليات الدخول ضد هجمات القوة العمياء.",
+        btn_start: "بدء الاختبار",
+        btn_payment: "إجراء الدفع",
+        footer_text: "© 2025 Security Lab. للأغراض التعليمية والاختبار القانوني فقط."
     }
-  };
+};
 
-  // ---- LANGUAGE HELPERS ----
+document.addEventListener('DOMContentLoaded', () => {
+    const languageSelector = document.getElementById('language-selector');
+    
+    // 1. Kaydedilmiş dili yükle veya varsayılan 'tr' yap
+    const savedLang = localStorage.getItem('selectedLanguage') || 'tr';
+    setLanguage(savedLang);
+    languageSelector.value = savedLang;
 
-  function normalizeLang(lang) {
-    if (!lang) return DEFAULT_LANG;
-    const lower = String(lang).toLowerCase();
-    if (SUPPORTED_LANGS.includes(lower)) return lower;
-    if (lower.startsWith("tr")) return "tr";
-    if (lower.startsWith("en")) return "en";
-    return DEFAULT_LANG;
-  }
-
-  function getCurrentLanguage() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return normalizeLang(stored);
-    } catch (_) {
-      // ignore storage errors
-    }
-    if (typeof navigator !== "undefined") {
-      return normalizeLang(navigator.language || navigator.userLanguage);
-    }
-    return DEFAULT_LANG;
-  }
-
-  function setCurrentLanguage(lang) {
-    const normalized = normalizeLang(lang);
-    try {
-      localStorage.setItem(STORAGE_KEY, normalized);
-    } catch (_) {
-      // ignore
-    }
-    document.documentElement.setAttribute("lang", normalized);
-    applyTranslations(normalized);
-    updateLanguageSwitchUI(normalized);
-    return normalized;
-  }
-
-  function t(lang, key) {
-    return (translations[lang] && translations[lang][key]) || "";
-  }
-
-  function applyTranslations(lang) {
-    // Elements with text content
-    document.querySelectorAll("[data-i18n]").forEach((el) => {
-      const key = el.getAttribute("data-i18n");
-      const value = t(lang, key);
-      if (value) el.textContent = value;
+    // 2. Dil seçildiğinde tetiklenen olay
+    languageSelector.addEventListener('change', (e) => {
+        const selectedLang = e.target.value;
+        setLanguage(selectedLang);
+        localStorage.setItem('selectedLanguage', selectedLang);
     });
+});
 
-    // Placeholders (if used later)
-    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-      const key = el.getAttribute("data-i18n-placeholder");
-      const value = t(lang, key);
-      if (value) el.setAttribute("placeholder", value);
+// Dil Değiştirme Fonksiyonu
+function setLanguage(lang) {
+    // HTML etiketindeki dil özelliğini güncelle
+    document.documentElement.lang = lang;
+
+    // Yönlendirme Ayarı (RTL / LTR)
+    if (lang === 'ar') {
+        document.documentElement.dir = 'rtl';
+        document.body.classList.add('rtl-mode');
+    } else {
+        document.documentElement.dir = 'ltr';
+        document.body.classList.remove('rtl-mode');
+    }
+
+    // Tüm çevrilebilir elementleri bul ve güncelle
+    const elements = document.querySelectorAll('[data-i18n]');
+    
+    elements.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        // Eğer o dil için çeviri varsa uygula
+        if (translations[lang] && translations[lang][key]) {
+            // Input placeholder ise farklı, normal text ise farklı davran
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = translations[lang][key];
+            } else {
+                element.textContent = translations[lang][key];
+            }
+        }
     });
-  }
-
-  function updateLanguageSwitchUI(lang) {
-    const buttons = document.querySelectorAll(".sl-lang-switch__btn");
-    buttons.forEach((btn) => {
-      const btnLang = btn.getAttribute("data-lang");
-      if (normalizeLang(btnLang) === lang) {
-        btn.classList.add("is-active");
-      } else {
-        btn.classList.remove("is-active");
-      }
-    });
-  }
-
-  function initLanguageSwitcher() {
-    const buttons = document.querySelectorAll(".sl-lang-switch__btn");
-    buttons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const lang = btn.getAttribute("data-lang");
-        setCurrentLanguage(lang);
-      });
-    });
-  }
-
-  // ---- CONSOLE / TESTS ----
-
-  const SCENARIO_SELECTORS = {
-    sql: "#btn-sql-injection",
-    xss: "#btn-xss",
-    ldap: "#btn-ldap",
-    payment: "#btn-payment",
-    bruteforce: "#btn-bruteforce"
-  };
-
-  let activeTimeout = null;
-
-  function clearConsole() {
-    const lang = getCurrentLanguage();
-    const outputEl = document.getElementById("console-output");
-    const statusEl = document.getElementById("console-status");
-    const scenarioEl = document.getElementById("console-scenario");
-
-    if (activeTimeout) {
-      clearTimeout(activeTimeout);
-      activeTimeout = null;
-    }
-
-    if (outputEl) {
-      const msg =
-        (translations[lang] && translations[lang]["console.empty"]) ||
-        "No test selected yet. Start a scenario on the left.";
-      outputEl.textContent = msg;
-    }
-    if (statusEl) {
-      statusEl.textContent =
-        (translations[lang] && translations[lang]["console.idle"]) ||
-        "Idle";
-    }
-    if (scenarioEl) {
-      scenarioEl.textContent = "-";
-    }
-  }
-
-  function runScenario(key) {
-    const lang = getCurrentLanguage();
-    const logsForLang = testLogs[lang] || {};
-    const lines = logsForLang[key] || [];
-
-    const outputEl = document.getElementById("console-output");
-    const statusEl = document.getElementById("console-status");
-    const scenarioEl = document.getElementById("console-scenario");
-
-    if (!outputEl || !statusEl || !scenarioEl) return;
-
-    if (activeTimeout) {
-      clearTimeout(activeTimeout);
-      activeTimeout = null;
-    }
-
-    const scenarioNameKey = `scenario.${key}.name`;
-    const scenarioName =
-      (translations[lang] && translations[lang][scenarioNameKey]) ||
-      key.toUpperCase();
-
-    scenarioEl.textContent = scenarioName;
-    statusEl.textContent =
-      (translations[lang] && translations[lang]["console.running"]) ||
-      "Running...";
-
-    if (!lines.length) {
-      const msg =
-        (translations[lang] && translations[lang]["console.noScript"]) ||
-        "No detailed script has been added for this scenario yet.";
-      outputEl.textContent = msg;
-      statusEl.textContent =
-        (translations[lang] && translations[lang]["console.done"]) ||
-        "Completed.";
-      return;
-    }
-
-    outputEl.textContent = "";
-    let index = 0;
-
-    function step() {
-      if (index >= lines.length) {
-        statusEl.textContent =
-          (translations[lang] && translations[lang]["console.done"]) ||
-          "Completed.";
-        activeTimeout = null;
-        return;
-      }
-      outputEl.textContent += lines[index] + "\n";
-      outputEl.scrollTop = outputEl.scrollHeight;
-      index += 1;
-      activeTimeout = setTimeout(step, 550);
-    }
-
-    step();
-  }
-
-  function initTestButtons() {
-    Object.entries(SCENARIO_SELECTORS).forEach(([key, selector]) => {
-      const btn = document.querySelector(selector);
-      if (!btn) return;
-      btn.addEventListener("click", () => runScenario(key));
-    });
-
-    const clearBtn = document.getElementById("btn-clear-console");
-    if (clearBtn) {
-      clearBtn.addEventListener("click", clearConsole);
-    }
-  }
-
-  // ---- INIT ----
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const initialLang = getCurrentLanguage();
-    setCurrentLanguage(initialLang);
-    initLanguageSwitcher();
-    initTestButtons();
-  });
-})();
+}
