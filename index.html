@@ -3,79 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Lab 2025</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>WAF & Security Traffic Generator | Enterprise Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- ENTERPRISE THEME (Deep Slate & Neon) --- */
+        :root {
+            --bg-app: #0f172a; --bg-panel: #1e293b; --bg-sidebar: #020617;
+            --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --accent: #38bdf8; --danger: #f43f5e; --success: #10b981; --warn: #f59e0b;
+            --font: 'Inter', system-ui, sans-serif;
+        }
+        
+        * { box-sizing: border-box; outline: none; }
+        body { background: var(--bg-app); color: var(--text-main); font-family: var(--font); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Header & Stats */
+        header { height: 65px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
+        .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .brand span { color: var(--accent); }
+        .brand .tag { font-size: 0.6em; background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; }
+        
+        .stats-bar { display: flex; gap: 20px; font-size: 0.9em; }
+        .stat-item { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-val { font-weight: bold; font-family: monospace; font-size: 1.1em; }
+        .stat-lbl { font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; }
+        
+        /* Layout */
+        .wrapper { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 320px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-header { padding: 15px 20px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: var(--bg-sidebar); z-index: 10; }
+        
+        .module-btn { padding: 12px 20px; border-bottom: 1px solid #1e293b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; color: var(--text-main); }
+        .module-btn:hover { background: rgba(56, 189, 248, 0.1); padding-left: 25px; }
+        .module-btn.active { border-left: 3px solid var(--accent); background: rgba(56, 189, 248, 0.05); }
+        .module-info h4 { margin: 0; font-size: 0.9rem; font-weight: 500; }
+        .module-info p { margin: 3px 0 0 0; font-size: 0.75rem; color: var(--text-muted); }
+        .play-icon { color: var(--border); font-size: 0.8rem; }
+        .module-btn:hover .play-icon { color: var(--accent); }
+
+        /* Main Console */
+        .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-app); position: relative; }
+        .console-toolbar { height: 40px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; justify-content: space-between; font-family: monospace; font-size: 0.85em; color: var(--text-muted); }
+        
+        .logs-container { flex: 1; overflow-y: auto; padding: 10px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.9rem; scroll-behavior: smooth; }
+        .log-entry { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: 80px 60px 60px 1fr; gap: 10px; align-items: baseline; animation: slideIn 0.2s ease-out; }
+        .log-entry:hover { background: rgba(255,255,255,0.02); }
+        
+        .col-time { color: #64748b; font-size: 0.85em; }
+        .col-method { font-weight: bold; }
+        .m-GET { color: #61affe; } .m-POST { color: #49cc90; } .m-PUT { color: #fca130; } .m-DELETE { color: #f43f5e; }
+        .col-status { font-weight: bold; }
+        .s-200 { color: var(--success); } .s-403 { color: var(--danger); } .s-429 { color: var(--warn); }
+        .col-detail { color: var(--text-muted); word-break: break-all; font-size: 0.9em; }
+        .payload-highlight { color: var(--accent); }
+
+        /* Lang Switcher */
+        .lang-select { background: var(--bg-app); border: 1px solid var(--border); color: var(--text-main); padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* RTL */
+        html[dir="rtl"] { direction: rtl; text-align: right; }
+        html[dir="rtl"] .module-btn { border-left: none; border-right: 1px solid transparent; }
+        html[dir="rtl"] .module-btn.active { border-right: 3px solid var(--accent); }
+        html[dir="rtl"] .module-btn:hover { padding-left: 20px; padding-right: 25px; }
+        
+        @media (max-width: 768px) { .wrapper { flex-direction: column; } .sidebar { width: 100%; height: 40%; } }
+    </style>
 </head>
 <body>
+
     <header>
-        <div class="container">
-            <nav>
-                <div class="logo"><a href="index.html">Security<span>Lab 2025</span></a></div>
-                <select id="lang-select">
-                    <option value="tr">🇹🇷 TR</option>
-                    <option value="en">🇬🇧 EN</option>
-                    <option value="fr">🇫🇷 FR</option>
-                    <option value="ar">🇸🇦 AR</option>
-                </select>
-            </nav>
+        <div class="brand">
+            <i class="fa-solid fa-shield-dog"></i> Security<span>Lab</span> 
+            <span class="tag">Pro 2025</span>
+        </div>
+        
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-total" style="color:var(--text-main)">0</span>
+                    <span class="stat-lbl" data-key="st_total">Requests</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-blocked" style="color:var(--danger)">0</span>
+                    <span class="stat-lbl" data-key="st_blocked">WAF Blocks</span>
+                </div>
+            </div>
+            <select class="lang-select" id="lang-picker" onchange="setLang(this.value)">
+                <option value="tr">🇹🇷 TR</option>
+                <option value="en">🇬🇧 EN</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="ar">🇸🇦 AR</option>
+            </select>
         </div>
     </header>
 
-    <main class="container">
-        <div style="text-align:center; padding: 40px 0;">
-            <h1 data-key="page_title">Siber Güvenlik Laboratuvarı 2025</h1>
-            <p data-key="page_sub" style="color:#94a3b8;">OWASP Web • API Security • Automated Threats</p>
+    <div class="wrapper">
+        <div class="sidebar" id="sidebar-modules">
+            </div>
+
+        <div class="main">
+            <div class="console-toolbar">
+                <span><i class="fa-solid fa-terminal"></i> LIVE TRAFFIC MONITOR</span>
+                <span id="status-text">IDLE</span>
+            </div>
+            <div class="logs-container" id="log-window">
+                <div class="log-entry" style="color:#666; display:block; text-align:center; padding-top:50px;">
+                    <i class="fa-solid fa-wifi" style="font-size:2em; margin-bottom:10px;"></i><br>
+                    System Ready. Select an attack module to generate traffic.
+                </div>
+            </div>
         </div>
+    </div>
 
-        <section>
-            <h2 class="section-title" data-key="sect_web">🌐 OWASP Web Top 10</h2>
-            <div class="grid">
-                <a href="test-lab.html?id=a01" class="card"><h3>A01: Broken Access</h3><p>Yetkilendirme İhlalleri & IDOR</p></a>
-                <a href="test-lab.html?id=a02" class="card"><h3>A02: Crypto Failures</h3><p>Hassas Veri İfşası</p></a>
-                <a href="test-lab.html?id=a03" class="card"><h3>A03: Injection</h3><p>SQL, NoSQL ve Komut Enjeksiyonu</p></a>
-                <a href="test-lab.html?id=a04" class="card"><h3>A04: Insecure Design</h3><p>Güvensiz Tasarım Hataları</p></a>
-                <a href="test-lab.html?id=a05" class="card"><h3>A05: Misconfig</h3><p>Hatalı Yapılandırma</p></a>
-                <a href="test-lab.html?id=a06" class="card"><h3>A06: Vuln. Components</h3><p>Eski ve Zafiyetli Bileşenler</p></a>
-                <a href="test-lab.html?id=a07" class="card"><h3>A07: Auth Failures</h3><p>Kimlik Doğrulama Hataları</p></a>
-                <a href="test-lab.html?id=a08" class="card"><h3>A08: Integrity Failures</h3><p>Veri Bütünlüğü Açıkları</p></a>
-                <a href="test-lab.html?id=a09" class="card"><h3>A09: Logging Failures</h3><p>Yetersiz Loglama</p></a>
-                <a href="test-lab.html?id=a10" class="card"><h3>A10: SSRF</h3><p>Sunucu Taraflı İstek Sahteciliği</p></a>
-            </div>
-        </section>
+<script>
+    /* --- 1. EXPERT CONFIGURATION & PAYLOADS --- */
+    const BASE_TARGET = window.location.origin + "/api"; // Targets the site itself
 
-        <section style="margin-top:50px;">
-            <h2 class="section-title" data-key="sect_api">🔌 OWASP API Security Top 10</h2>
-            <div class="grid">
-                <a href="test-lab.html?id=api1" class="card"><h3>API1: BOLA</h3><p>Nesne Düzeyinde Yetki</p></a>
-                <a href="test-lab.html?id=api2" class="card"><h3>API2: Broken Auth</h3><p>API Kimlik Doğrulama</p></a>
-                <a href="test-lab.html?id=api3" class="card"><h3>API3: BOP A</h3><p>Toplu Atama (Mass Assignment)</p></a>
-                <a href="test-lab.html?id=api4" class="card"><h3>API4: Resource Cons.</h3><p>Rate Limit & DoS</p></a>
-                <a href="test-lab.html?id=api5" class="card"><h3>API5: BFLA</h3><p>Fonksiyon Düzeyinde Yetki</p></a>
-                <a href="test-lab.html?id=api6" class="card"><h3>API6: Sensitive Flows</h3><p>Hassas Akış İhlali</p></a>
-                <a href="test-lab.html?id=api7" class="card"><h3>API7: SSRF (API)</h3><p>API Tabanlı SSRF</p></a>
-                <a href="test-lab.html?id=api8" class="card"><h3>API8: Misconfig</h3><p>Güvensiz Yapılandırma</p></a>
-                <a href="test-lab.html?id=api9" class="card"><h3>API9: Inventory</h3><p>Eski API Yönetimi</p></a>
-                <a href="test-lab.html?id=api10" class="card"><h3>API10: Unsafe Cons.</h3><p>3. Parti Veri Tüketimi</p></a>
-            </div>
-        </section>
+    const modules = [
+        // === OWASP WEB TOP 10 ===
+        { id: 'a01', cat: 'web', icon: 'fa-id-badge', tr: {t:'Broken Access (IDOR)', d:'Admin ID 1 erişimi'}, en: {t:'Broken Access (IDOR)', d:'Access Admin ID 1'} },
+        { id: 'a02', cat: 'web', icon: 'fa-credit-card', tr: {t:'Cryptographic Fail', d:'Şifresiz CC gönder'}, en: {t:'Cryptographic Fail', d:'Send Cleartext CC'} },
+        { id: 'a03', cat: 'web', icon: 'fa-database', tr: {t:'Injection (SQLi)', d:'UNION SELECT saldırısı'}, en: {t:'Injection (SQLi)', d:'UNION SELECT Attack'} },
+        { id: 'a04', cat: 'web', icon: 'fa-compass-drafting', tr: {t:'Insecure Design', d:'Logic Bypass (Kupon)'}, en: {t:'Insecure Design', d:'Logic Bypass (Coupon)'} },
+        { id: 'a05', cat: 'web', icon: 'fa-gears', tr: {t:'Misconfiguration', d:'Default dosya tara'}, en: {t:'Misconfiguration', d:'Scan Default Files'} },
+        { id: 'a06', cat: 'web', icon: 'fa-box-open', tr: {t:'Vuln. Components', d:'Eski jQuery çağır'}, en: {t:'Vuln. Components', d:'Call Old jQuery'} },
+        { id: 'a07', cat: 'web', icon: 'fa-unlock', tr: {t:'Auth Failures', d:'Brute Force Login'}, en: {t:'Auth Failures', d:'Brute Force Login'} },
+        { id: 'a08', cat: 'web', icon: 'fa-file-code', tr: {t:'Integrity Fail', d:'Malicious Upload'}, en: {t:'Integrity Fail', d:'Malicious Upload'} },
+        { id: 'a09', cat: 'web', icon: 'fa-eraser', tr: {t:'Logging Failures', d:'Log silme isteği'}, en: {t:'Logging Failures', d:'Log Delete Req'} },
+        { id: 'a10', cat: 'web', icon: 'fa-server', tr: {t:'SSRF', d:'Cloud Metadata Çek'}, en: {t:'SSRF', d:'Fetch Cloud Metadata'} },
 
-        <section style="margin-top:50px;">
-            <h2 class="section-title" data-key="sect_oat">🤖 Automated Threats (OAT)</h2>
-            <div class="grid">
-                <a href="test-lab.html?id=oat1" class="card"><h3>OAT-001: Carding</h3><p>Ödeme Manipülasyonu</p></a>
-                <a href="test-lab.html?id=oat2" class="card"><h3>OAT-007: Cracking</h3><p>Credential Cracking</p></a>
-                <a href="test-lab.html?id=oat3" class="card"><h3>OAT-008: Stuffing</h3><p>Credential Stuffing</p></a>
-                <a href="test-lab.html?id=oat4" class="card"><h3>OAT-011: Scraping</h3><p>Veri Kazıma Botları</p></a>
-                <a href="test-lab.html?id=oat5" class="card"><h3>OAT-015: DoS</h3><p>Hizmet Reddi Saldırısı</p></a>
-            </div>
-        </section>
+        // === API SECURITY ===
+        { id: 'api1', cat: 'api', icon: 'fa-users-viewfinder', tr: {t:'BOLA / IDOR', d:'ID Enumeration'}, en: {t:'BOLA / IDOR', d:'ID Enumeration'} },
+        { id: 'api2', cat: 'api', icon: 'fa-key', tr: {t:'Broken Auth', d:'No-Token Request'}, en: {t:'Broken Auth', d:'No-Token Request'} },
+        { id: 'api3', cat: 'api', icon: 'fa-user-tag', tr: {t:'Mass Assignment', d:'Admin Role Injection'}, en: {t:'Mass Assignment', d:'Admin Role Injection'} },
+        { id: 'api4', cat: 'api', icon: 'fa-burst', tr: {t:'Rate Limit (DoS)', d:'High Volume Flood'}, en: {t:'Rate Limit (DoS)', d:'High Volume Flood'} },
+        { id: 'api5', cat: 'api', icon: 'fa-ban', tr: {t:'BFLA', d:'Unauthorized DELETE'}, en: {t:'BFLA', d:'Unauthorized DELETE'} },
+        
+        // === AUTOMATED THREATS ===
+        { id: 'oat1', cat: 'oat', icon: 'fa-money-check', tr: {t:'Carding Bot', d:'CC Validation Attack'}, en: {t:'Carding Bot', d:'CC Validation Attack'} },
+        { id: 'oat2', cat: 'oat', icon: 'fa-address-book', tr: {t:'Account Enum', d:'User Discovery'}, en: {t:'Account Enum', d:'User Discovery'} },
+        { id: 'oat3', cat: 'oat', icon: 'fa-passport', tr: {t:'Credential Stuffing', d:'Leaked DB Login'}, en: {t:'Credential Stuffing', d:'Leaked DB Login'} },
+        { id: 'oat4', cat: 'oat', icon: 'fa-spider', tr: {t:'Scraping Bot', d:'Rapid Data Extraction'}, en: {t:'Scraping Bot', d:'Rapid Data Extraction'} },
+        { id: 'oat5', cat: 'oat', icon: 'fa-meteor', tr: {t:'L7 DDoS', d:'Application Stress'}, en: {t:'L7 DDoS', d:'Application Stress'} }
+    ];
 
-        <footer style="text-align:center; padding: 40px 0; color:#666; font-size:0.9em;">
-            <p data-key="footer">© 2025 Security Lab. Eğitim ve test amaçlıdır.</p>
-        </footer>
-    </main>
+    const translations = {
+        tr: { cat_web: "WEB GÜVENLİĞİ", cat_api: "API GÜVENLİĞİ", cat_oat: "BOT & OTOMASYON", st_total: "TOPLAM İSTEK", st_blocked: "ENNELLENEN (403)" },
+        en: { cat_web: "WEB SECURITY", cat_api: "API SECURITY", cat_oat: "BOT & AUTOMATION", st_total: "TOTAL REQ", st_blocked: "BLOCKED (403)" },
+        fr: { cat_web: "SÉCURITÉ WEB", cat_api: "SÉCURITÉ API", cat_oat: "BOTS", st_total: "TOTAL", st_blocked: "BLOQUÉ" },
+        ar: { cat_web: "أمن الويب", cat_api: "أمن API", cat_oat: "الروبوتات", st_total: "مجموع الطلبات", st_blocked: "محظور" }
+    };
 
-    <script src="script.js"></script>
+    let stats = { total: 0, blocked: 0 };
+    let currentLang = localStorage.getItem('lang') || 'tr';
+
+    /* --- 2. ATTACK LOGIC (REAL TRAFFIC) --- */
+    async function executeAttack(id) {
+        updateStatus(`EXECUTING: ${id.toUpperCase()}...`);
+        
+        // A03: SQL Injection
+        if(id === 'a01') await sendReq('/users/1', 'GET'); // IDOR
+        if(id === 'a02') await sendReq('/pay', 'POST', {cc:'4111111111111111', cvv:'123'}); // Cleartext
+        if(id === 'a03') await sendReq('/search?q='+encodeURIComponent("' UNION SELECT 1, version() --"), 'GET'); // SQLi
+        if(id === 'a04') await sendReq('/cart/checkout', 'POST', {coupon:'DEV_100_OFF'}); // Logic
+        if(id === 'a05') await sendReq('/.git/config', 'GET'); // Misconfig
+        if(id === 'a06') await sendReq('/assets/jquery-1.6.js', 'GET'); // Old Component
+        if(id === 'a07') { for(let i=0; i<3; i++) await sendReq('/login', 'POST', {u:'admin', p:'123456'}); } // Brute Force
+        if(id === 'a08') await sendReq('/upload', 'POST', {file:'shell.php.jpg'}); // Integrity
+        if(id === 'a09') await sendReq('/admin/logs', 'DELETE'); // Logging
+        if(id === 'a10') await sendReq('/proxy?url=http://169.254.169.254/latest', 'GET'); // SSRF
+
+        if(id === 'api1') { for(let i=1000; i<1005; i++) await sendReq(`/users/${i}`, 'GET'); } // BOLA
+        if(id === 'api2') await sendReq('/dashboard', 'GET', null, {'Authorization':'None'}); // Broken Auth
+        if(id === 'api3') await sendReq('/profile', 'POST', {role:'ADMIN', is_root:true}); // Mass Assign
+        if(id === 'api4') { for(let i=0; i<10; i++) fetch(BASE_TARGET + '/flood?t='+Date.now()); updateStats(10,0); addLog('GET', '/flood (x10)', 429, 'DoS Flood'); } // DoS
+        if(id === 'api5') await sendReq('/admin/users', 'DELETE'); // BFLA
+
+        if(id === 'oat1') { for(let i=0; i<3; i++) await sendReq('/validate-cc', 'POST', {cc:'450000000000'+i}); } // Carding
+        if(id === 'oat2') await sendReq('/recover', 'POST', {email:'admin@corp.com'}); // Enumeration
+        if(id === 'oat3') await sendReq('/login', 'POST', {user:'leaked', pass:'pass123'}); // Stuffing
+        if(id === 'oat4') { for(let i=0; i<5; i++) await sendReq(`/product/${i}`, 'GET'); } // Scraping
+        if(id === 'oat5') { for(let i=0; i<15; i++) fetch(BASE_TARGET + '/heavy'); updateStats(15,0); addLog('GET', '/heavy (x15)', 0, 'L7 Stress'); } // DDoS
+
+        updateStatus('IDLE');
+    }
+
+    async function sendReq(path, method, body=null, headers={}) {
+        const url = BASE_TARGET + path;
+        const opts = {
+            method: method,
+            headers: { 'Content-Type': 'application/json', ...headers }
+        };
+        if(body && method !== 'GET') opts.body = JSON.stringify(body);
+
+        let status = 0;
+        try {
+            const res = await fetch(url, opts);
+            status = res.status;
+        } catch(e) { status = 0; } // Network Error / WAF Drop
+
+        // Update Stats
+        stats.total++;
+        if(status === 403 || status === 0) stats.blocked++;
+        updateUIStats();
+
+        // Add Log
+        const payloadStr = body ? JSON.stringify(body) : (path.includes('?') ? path.split('?')[1] : '-');
+        addLog(method, path, status, payloadStr);
+    }
+
+    /* --- 3. UI RENDERING --- */
+    function init() {
+        document.getElementById('lang-picker').value = currentLang;
+        renderSidebar();
+        updateTexts();
+    }
+
+    function setLang(l) {
+        currentLang = l;
+        localStorage.setItem('lang', l);
+        document.documentElement.lang = l;
+        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+        renderSidebar();
+        updateTexts();
+    }
+
+    function renderSidebar() {
+        const sb = document.getElementById('sidebar-modules');
+        sb.innerHTML = '';
+        
+        const cats = ['web', 'api', 'oat'];
+        const t = translations[currentLang] || translations['en'];
+
+        cats.forEach(cat => {
+            const header = document.createElement('div');
+            header.className = 'sidebar-header';
+            header.innerText = t['cat_'+cat];
+            sb.appendChild(header);
+
+            modules.filter(m => m.cat === cat).forEach(m => {
+                const txt = m[currentLang] || m['en'];
+                const btn = document.createElement('div');
+                btn.className = 'module-btn';
+                btn.onclick = () => executeAttack(m.id);
+                btn.innerHTML = `
+                    <div class="module-info">
+                        <h4><i class="fa-solid ${m.icon}" style="margin-right:8px; color:var(--accent)"></i>${txt.t}</h4>
+                        <p>${txt.d}</p>
+                    </div>
+                    <i class="fa-solid fa-play play-icon"></i>
+                `;
+                sb.appendChild(btn);
+            });
+        });
+    }
+
+    function addLog(method, url, status, detail) {
+        const box = document.getElementById('log-window');
+        const row = document.createElement('div');
+        row.className = 'log-entry';
+        
+        let sClass = 's-200';
+        if(status === 403 || status === 0) sClass = 's-403';
+        if(status === 429) sClass = 's-429';
+
+        row.innerHTML = `
+            <span class="col-time">${new Date().toLocaleTimeString()}</span>
+            <span class="col-method m-${method}">${method}</span>
+            <span class="col-status ${sClass}">${status === 0 ? 'ERR' : status}</span>
+            <span class="col-detail">${url} <span class="payload-highlight">${detail}</span></span>
+        `;
+        
+        // Clear initial msg if exists
+        if(box.children[0] && box.children[0].style.textAlign === 'center') box.innerHTML = '';
+        box.prepend(row);
+    }
+
+    function updateUIStats() {
+        document.getElementById('stat-total').innerText = stats.total;
+        document.getElementById('stat-blocked').innerText = stats.blocked;
+    }
+    
+    function updateStatus(msg) {
+        document.getElementById('status-text').innerText = msg;
+    }
+
+    function updateTexts() {
+        const t = translations[currentLang] || translations['en'];
+        document.querySelectorAll('[data-key]').forEach(el => {
+            el.innerText = t[el.getAttribute('data-key')] || el.innerText;
+        });
+    }
+
+    window.onload = init;
+</script>
 </body>
 </html>
