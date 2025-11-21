@@ -3,184 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Testing Lab - Ana Sayfa</title>
+    <title>Security Testing Lab</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .navbar { background: rgba(255,255,255,0.98); padding: 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar .container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .nav-brand { font-size: 1.5rem; font-weight: 700; color: #667eea; }
+        .nav-menu { display: flex; list-style: none; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-menu a { color: #1f2937; text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; background: #f3f4f6; font-weight: 500; transition: 0.3s; }
+        .nav-menu a:hover { background: #667eea; color: white; }
+        .language-selector { margin-left: auto; }
+        .language-selector select { padding: 0.6rem 1rem; border: 2px solid #667eea; border-radius: 8px; background: white; font-weight: 600; cursor: pointer; }
+        .hero { background: white; padding: 3rem 2rem; border-radius: 20px; margin: 2rem auto; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-width: 1400px; }
+        .hero h1 { font-size: 2.5rem; color: #1f2937; margin-bottom: 1rem; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 2rem; margin: 2rem auto; max-width: 1400px; padding: 0 20px; }
+        .test-card { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+        .test-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+        .test-card h3 { color: #667eea; margin-bottom: 1rem; font-size: 1.4rem; }
+        .test-instructions { background: linear-gradient(135deg, #fef3c7, #fed7aa); border-left: 5px solid #f59e0b; padding: 1.5rem; margin: 1rem 0; border-radius: 10px; }
+        .test-instructions h4 { color: #92400e; margin-bottom: 0.8rem; }
+        .test-instructions ol { margin-left: 1.5rem; color: #78350f; }
+        .test-instructions code { background: #fed7aa; padding: 0.3rem 0.6rem; border-radius: 5px; font-family: monospace; color: #92400e; }
+        .test-input { width: 100%; padding: 0.8rem; border: 2px solid #d1d5db; border-radius: 8px; margin: 0.5rem 0; }
+        .btn { padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-block { width: 100%; display: block; margin: 0.5rem 0; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">🔐 Security Lab</div>
             <ul class="nav-menu">
-                <li><a href="index.html">Ana Sayfa</a></li>
-                <li><a href="login.html">Giriş</a></li>
-                <li><a href="register.html">Kayıt</a></li>
-                <li><a href="payment.html">Ödeme</a></li>
-                <li><a href="profile.html">Profil</a></li>
-                <li><a href="admin.html">Admin</a></li>
+                <li><a href="index.html">🏠 Ana Sayfa</a></li>
+                <li><a href="login.html">🔑 Giriş</a></li>
+                <li><a href="payment.html">💳 Ödeme</a></li>
+                <li><a href="search.html">🔍 Arama</a></li>
             </ul>
+            <div class="language-selector">
+                <select id="languageSelect" onchange="changeLanguage(this.value)">
+                    <option value="tr">🇹🇷 Türkçe</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <header class="hero">
-            <h1>🎯 Comprehensive Security Testing Laboratory</h1>
-            <p class="subtitle">OWASP Top 10 | LLM Top 10 | Automated Threats | API Security</p>
-        </header>
-
-        <section class="warning-box">
-            <h2>⚠️ UYARI</h2>
-            <p>Bu site <strong>kasıtlı olarak güvenlik açıkları içermektedir</strong>. Sadece eğitim ve güvenlik testi amaçlıdır.</p>
-        </section>
-
-        <div class="test-categories">
-            <div class="category-card">
-                <h2>💳 Payment Security (PCI DSS)</h2>
-                <ul>
-                    <li><a href="payment.html">Payment Form (PCI DSS Violations)</a></li>
-                    <li><a href="payment.html">CVV Storage (Insecure)</a></li>
-                    <li><a href="payment.html">Card Number Logging</a></li>
-                    <li><a href="payment.html">No 3D Secure</a></li>
-                    <li><a href="payment.html">CVV Brute Force</a></li>
-                    <li><a href="payment.html">Card Testing (Carding)</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>🌐 Multi-Language Support</h2>
-                <p>Site dili değiştirilebilir:</p>
-                <ul>
-                    <li>🇹🇷 Türkçe</li>
-                    <li>🇬🇧 English</li>
-                    <li>🇫🇷 Français</li>
-                    <li>🇸🇦 العربية (RTL support)</li>
-                </ul>
-                <p style="margin-top: 1rem;">Tüm sayfalar otomatik çevrilir!</p>
-            </div>
-
-            <div class="category-card">
-                <h2>🔓 OWASP Top 10 (2021)</h2>
-                <ul>
-                    <li><a href="login.html">A01: Broken Access Control</a></li>
-                    <li><a href="profile.html?user=admin">A02: Cryptographic Failures</a></li>
-                    <li><a href="search.html">A03: Injection (SQL, XSS)</a></li>
-                    <li><a href="upload.html">A04: Insecure Design</a></li>
-                    <li><a href="admin.html">A05: Security Misconfiguration</a></li>
-                    <li><a href="profile.html">A07: Authentication Failures</a></li>
-                    <li><a href="api-test.html">A08: Data Integrity Failures</a></li>
-                    <li><a href="admin.html">A09: Logging Failures</a></li>
-                    <li><a href="api-test.html">A10: SSRF</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>🤖 OWASP LLM Top 10</h2>
-                <ul>
-                    <li><a href="ai-chat.html">LLM01: Prompt Injection</a></li>
-                    <li><a href="ai-chat.html">LLM02: Insecure Output Handling</a></li>
-                    <li><a href="ai-chat.html">LLM03: Training Data Poisoning</a></li>
-                    <li><a href="ai-chat.html">LLM04: Model DoS</a></li>
-                    <li><a href="ai-chat.html">LLM06: Info Disclosure</a></li>
-                    <li><a href="ai-chat.html">LLM07: Insecure Plugin Design</a></li>
-                    <li><a href="ai-chat.html">LLM08: Excessive Agency</a></li>
-                    <li><a href="ai-chat.html">LLM09: Overreliance</a></li>
-                    <li><a href="ai-chat.html">LLM10: Model Theft</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>🤖 OWASP Automated Threats</h2>
-                <ul>
-                    <li><a href="bot-challenge.html">OAT-001: Carding</a></li>
-                    <li><a href="bot-challenge.html">OAT-005: Scalping</a></li>
-                    <li><a href="bot-challenge.html">OAT-007: Credential Cracking</a></li>
-                    <li><a href="bot-challenge.html">OAT-008: Credential Stuffing</a></li>
-                    <li><a href="bot-challenge.html">OAT-011: Scraping</a></li>
-                    <li><a href="bot-challenge.html">OAT-013: Sniping</a></li>
-                    <li><a href="bot-challenge.html">OAT-015: Denial of Service</a></li>
-                    <li><a href="bot-challenge.html">OAT-020: Account Aggregation</a></li>
-                    <li><a href="bot-challenge.html">OAT-021: Denial of Inventory</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>🔑 Account Takeover Tests</h2>
-                <ul>
-                    <li><a href="login.html">Brute Force Login</a></li>
-                    <li><a href="register.html">Account Enumeration</a></li>
-                    <li><a href="forgot-password.html">Password Reset Flaws</a></li>
-                    <li><a href="profile.html">Session Hijacking</a></li>
-                    <li><a href="profile.html">CSRF on Profile Update</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>🌐 API & Infrastructure</h2>
-                <ul>
-                    <li><a href="api-test.html">REST API Testing</a></li>
-                    <li><a href="api-test.html">Rate Limiting Bypass</a></li>
-                    <li><a href="api-test.html">API Authentication</a></li>
-                    <li><a href="upload.html">File Upload API</a></li>
-                    <li><a href="admin.html">Admin API Endpoints</a></li>
-                </ul>
-            </div>
-
-            <div class="category-card">
-                <h2>📄 JavaScript-Free Pages</h2>
-                <p>CSP Bypass & Client-Side Protection Testing</p>
-                <ul>
-                    <li><a href="static-page1.html">Static Page 1 (No JS)</a></li>
-                    <li><a href="static-page2.html">Static Page 2 (No JS)</a></li>
-                </ul>
-            </div>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        <div class="hero">
+            <h1>🎯 Güvenlik Test Laboratuvarı</h1>
+            <p>OWASP Top 10 | PCI DSS | API Testing</p>
         </div>
 
-        <section class="stats-section">
-            <h2>📊 Site İstatistikleri</h2>
-            <div class="stats-grid">
-                <div class="stat-box" id="visitor-count">
-                    <h3>Ziyaretçi</h3>
-                    <p class="stat-number">Loading...</p>
-                </div>
-                <div class="stat-box" id="api-calls">
-                    <h3>API Çağrıları</h3>
-                    <p class="stat-number">Loading...</p>
-                </div>
-                <div class="stat-box" id="failed-logins">
-                    <h3>Başarısız Giriş</h3>
-                    <p class="stat-number">Loading...</p>
+        <div class="cards-grid">
+            <div class="test-card">
+                <h3>💉 SQL Injection</h3>
+                <div class="test-instructions">
+                    <h4>🎯 Test Adımları:</h4>
+                    <ol>
+                        <li><a href="search.html" style="color:#667eea;font-weight:600">Arama sayfasına</a> git</li>
+                        <li>Buraya yaz: <code>' OR '1'='1</code></li>
+                        <li>Enter'a bas</li>
+                        <li>✅ Tüm kullanıcıları göreceksin!</li>
+                    </ol>
+                    <input type="text" class="test-input" placeholder="Buradan test et: ' OR '1'='1" id="sqlTest">
+                    <button class="btn btn-danger btn-block" onclick="window.location.href='search.html?q='+encodeURIComponent(document.getElementById('sqlTest').value||\"' OR '1'='1\")">SQL Injection Test Et</button>
                 </div>
             </div>
-        </section>
 
-        <!-- Vulnerable comment with hidden info -->
-        <!-- TODO: Remove admin credentials: admin@test.com / Admin123! -->
-        <!-- API Key: sk-test-vulnerable-key-12345 -->
+            <div class="test-card">
+                <h3>💳 Ödeme Güvenliği (PCI DSS)</h3>
+                <div class="test-instructions">
+                    <h4>🎯 Test Adımları:</h4>
+                    <ol>
+                        <li><a href="payment.html" style="color:#667eea;font-weight:600">Ödeme sayfasına</a> git</li>
+                        <li>"Test Kartı Doldur" butonuna tıkla</li>
+                        <li>"Kartımı kaydet" işaretle</li>
+                        <li>Ödeme yap</li>
+                        <li>F12 aç → Application → Local Storage</li>
+                        <li>✅ CVV bile saklanmış göreceksin!</li>
+                    </ol>
+                    <button class="btn btn-primary btn-block" onclick="window.location.href='payment.html'">Ödeme Testine Başla</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🔓 IDOR (Profil Erişimi)</h3>
+                <div class="test-instructions">
+                    <h4>🎯 Test Adımları:</h4>
+                    <ol>
+                        <li><a href="profile.html?user=1" style="color:#667eea;font-weight:600">Profil sayfasına</a> git</li>
+                        <li>URL'deki <code>?user=1</code> değiştir</li>
+                        <li><code>?user=2</code> veya <code>?user=3</code> yaz</li>
+                        <li>✅ Başkalarının profilini göreceksin!</li>
+                    </ol>
+                    <input type="number" class="test-input" placeholder="Kullanıcı ID (1,2,3)" id="idorTest" value="2">
+                    <button class="btn btn-danger btn-block" onclick="window.location.href='profile.html?user='+document.getElementById('idorTest').value">Profili Görüntüle</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🔢 CVV Brute Force</h3>
+                <div class="test-instructions">
+                    <h4>🎯 Test Adımları:</h4>
+                    <ol>
+                        <li><a href="payment.html" style="color:#667eea;font-weight:600">Ödeme sayfasına</a> git</li>
+                        <li>Aşağı kaydır</li>
+                        <li>"Brute Force Başlat" butonunu bul</li>
+                        <li>Tıkla ve izle</li>
+                        <li>✅ 1000 CVV deneniyor - rate limit yok!</li>
+                    </ol>
+                    <button class="btn btn-danger btn-block" onclick="window.location.href='payment.html#brute'">CVV Brute Force →</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer>
-        <p>🔓 Deliberately Vulnerable Application | For Educational Purposes Only</p>
-        <p>Built for OWASP Top 10, LLM Security, and Automated Threat Testing</p>
-    </footer>
-
-    <script src="js/main.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
-        // Vulnerable: Exposing sensitive data in client-side
-        window.CONFIG = {
-            apiUrl: '/api',
-            adminPanel: '/admin.html',
-            debugMode: true,
-            apiKey: 'exposed-api-key-in-js'
-        };
-
-        // Load statistics with vulnerable API call
-        fetch('/api/stats.json')
-            .then(r => r.json())
-            .then(data => {
-                document.querySelector('#visitor-count .stat-number').textContent = data.visitors;
-                document.querySelector('#api-calls .stat-number').textContent = data.apiCalls;
-                document.querySelector('#failed-logins .stat-number').textContent = data.failedLogins;
-            })
-            .catch(e => console.error('Stats load error:', e));
+        const savedLang = localStorage.getItem('language') || 'tr';
+        document.getElementById('languageSelect').value = savedLang;
+        if (typeof changeLanguage === 'function') changeLanguage(savedLang);
     </script>
 </body>
 </html>
