@@ -6,7 +6,7 @@
     <title>TITAN | Enterprise WAF Tester</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- CLEAN UI THEME --- */
+        /* --- UI THEME --- */
         :root {
             --bg: #0a0a0a; --sidebar: #111; --border: #333;
             --accent: #00e5ff; --danger: #ff0055; --text: #ddd;
@@ -75,23 +75,17 @@
 
     <div class="workspace">
         <div class="attack-panel">
-            
             <div class="col">
                 <div class="col-header" style="border-bottom: 2px solid #00e1ff">OWASP WEB 10</div>
-                <div class="col-body" id="list-web">
-                    </div>
+                <div class="col-body" id="list-web"></div>
             </div>
-
             <div class="col">
                 <div class="col-header" style="border-bottom: 2px solid #ff0055">API SECURITY</div>
-                <div class="col-body" id="list-api">
-                    </div>
+                <div class="col-body" id="list-api"></div>
             </div>
-
             <div class="col">
                 <div class="col-header" style="border-bottom: 2px solid #ffaa00">BOT THREATS</div>
-                <div class="col-body" id="list-bot">
-                    </div>
+                <div class="col-body" id="list-bot"></div>
             </div>
         </div>
 
@@ -107,14 +101,16 @@
     </div>
 
 <script>
-    // --- 1. TEMİZLENMİŞ SALDIRI VERİTABANI ---
-    // Spagetti kod yerine, her saldırı burada bir obje olarak tanımlı.
+    /* NOT: Aşağıdaki payloadlarda HTML karakterleri özellikle \u003C ve \u003E 
+       şeklinde kodlanmıştır. Bu, tarayıcının scripti yanlışlıkla kapatmasını engeller. 
+       Kopyala-yapıştır yaparken bu yapı bozulmaz.
+    */
     
     const ATTACK_DB = {
         WEB: [
             { id: 'A01', label: 'Broken Access', desc: 'LFI / Traversal', reqs: [
                 { u: '/admin', m: 'GET' }, 
-                { u: '/../../etc/passwd', m: 'GET' } 
+                { u: '/../../../../etc/passwd', m: 'GET' } 
             ]},
             { id: 'A02', label: 'Crypto Fail', desc: 'Cleartext Data', reqs: [
                 { u: '/api/pay', m: 'POST', b: {cc:'4111222233334444', cvv:'123'} }
@@ -124,8 +120,8 @@
                 { u: "/login", m: 'POST', b: {user: "admin' --", pass: "123"} }
             ]},
             { id: 'A03X', label: 'Injection (XSS)', desc: 'Script Tags', reqs: [
-                { u: "/search?q=<script>alert(1)</script>", m: 'GET' },
-                { u: "/contact", m: 'POST', b: {msg: "<img src=x onerror=alert(1)>"} }
+                { u: "/search?q=\u003Cscript\u003Ealert(1)\u003C/script\u003E", m: 'GET' },
+                { u: "/contact", m: 'POST', b: {msg: "\u003Cimg src=x onerror=alert(1)\u003E"} }
             ]},
             { id: 'A04', label: 'Insecure Design', desc: 'Logic Abuse', reqs: [
                 { u: '/shop/checkout', m: 'POST', b: {coupon: '100_OFF', price: 0} }
@@ -137,7 +133,7 @@
                 { u: '/assets/jquery-1.6.js', m: 'GET' }
             ]},
             { id: 'A07', label: 'Auth Failures', desc: 'Brute Force', loop: 5, reqs: [
-                { u: '/login', m: 'POST', b: {u: 'admin', p: 'pass{i}'} } // {i} döngü sayısıdır
+                { u: '/login', m: 'POST', b: {u: 'admin', p: 'pass{i}'} }
             ]},
             { id: 'A08', label: 'Integrity Fail', desc: 'Deserialization', reqs: [
                 { u: '/api/data', m: 'POST', b: {obj: 'rO0ABXNyABFq...'} }
@@ -160,7 +156,7 @@
                 { u: '/api/profile', m: 'POST', b: {role: 'ADMIN'} }
             ]},
             { id: 'API4', label: 'Rate Limit', desc: 'HTTP Flood', loop: 20, reqs: [
-                { u: '/api/search?q=test&t={r}', m: 'GET' } // {r} random sayıdır
+                { u: '/api/search?q=test&t={r}', m: 'GET' }
             ]},
             { id: 'API5', label: 'BFLA', desc: 'Unauth DELETE', reqs: [
                 { u: '/api/users', m: 'DELETE' }
@@ -178,7 +174,7 @@
                 { u: '/api/v1/login', m: 'GET' }, { u: '/api/v0/login', m: 'GET' }
             ]},
             { id: 'API10', label: 'Unsafe Cons.', desc: 'Injection', reqs: [
-                { u: '/api/xml', m: 'POST', b: {xml: '<!ENTITY xxe...>'} }
+                { u: '/api/xml', m: 'POST', b: {xml: '\u003C!ENTITY xxe...\u003E'} }
             ]}
         ],
         BOT: [
@@ -203,8 +199,7 @@
         ]
     };
 
-    // --- 2. UI OLUŞTURUCU ---
-    // Sayfa yüklenince butonları otomatik oluşturur
+    // --- UI OLUŞTURUCU ---
     function init() {
         createButtons('list-web', ATTACK_DB.WEB);
         createButtons('list-api', ATTACK_DB.API);
@@ -222,7 +217,7 @@
         });
     }
 
-    // --- 3. MOTOR (TRAFFIC ENGINE) ---
+    // --- MOTOR (TRAFFIC ENGINE) ---
     let sentCount = 0;
     const rnd = () => Math.floor(Math.random() * 999999);
 
@@ -272,4 +267,39 @@
         
         if(body && method !== 'GET') opts.body = JSON.stringify(body);
 
-        log(method, 'SENT',
+        log(method, 'SENT', url); // Loga hemen yaz
+
+        try {
+            await fetch(url, opts);
+            // no-cors olduğu için cevap durumunu tarayıcı gizler.
+            // Amaç trafiği WAF'a ulaştırmaktır.
+        } catch (e) {
+            log(method, 'ERR', e.message);
+        }
+    }
+
+    function log(method, status, url) {
+        const box = document.getElementById('console');
+        const row = document.createElement('div');
+        row.className = 'log-row';
+        
+        let sClass = status === 'SENT' ? 's-SENT' : 's-ERR';
+        // URL'i kısalt
+        const shortUrl = url.length > 40 ? '...' + url.substring(url.length - 40) : url;
+
+        row.innerHTML = `
+            <span class="l-time">${new Date().toLocaleTimeString()}</span>
+            <span class="l-stat ${sClass}">${status}</span>
+            <span class="l-url"><b>${method}</b> ${shortUrl}</span>
+        `;
+        
+        if(box.children.length > 50) box.lastElementChild.remove();
+        box.prepend(row);
+    }
+
+    // Sayfa yüklendiğinde başlat
+    window.onload = init;
+
+</script>
+</body>
+</html>
