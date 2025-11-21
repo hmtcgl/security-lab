@@ -3,24 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Lab - Web Güvenliği Test Platformu (OWASP)</title>
+    <title>Security Lab - Web Güvenliği Test Platformu</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <header>
         <div class="container">
             <nav>
-                <div class="logo"><a href="index.html">Security Lab</a></div>
-                <ul>
-                    <li><a href="index.html" data-tr="nav-home">Ana Sayfa</a></li>
-                    <li><a href="all-tests.html" data-tr="nav-tests">Tüm Testler</a></li>
-                    </ul>
+                <div class="logo">
+                    <a href="index.html">Security<span>Lab</span></a>
+                </div>
+                
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="nav_home">Ana Sayfa</a></li>
+                    <li><a href="#" data-i18n="nav_tests">Tüm Testler</a></li>
+                    <li><a href="#" data-i18n="nav_about">Hakkında</a></li>
+                </ul>
 
-                <select id="language-selector">
-                    <option value="tr">Türkçe</option>
-                    <option value="en">English</option>
-                </select>
+                <div class="lang-wrapper">
+                    <select id="language-selector">
+                        <option value="tr">🇹🇷 TR</option>
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="ar">🇸🇦 AR</option>
+                    </select>
+                </div>
             </nav>
         </div>
     </header>
@@ -28,60 +37,57 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1 data-tr="hero-title">Web Güvenliği Laboratuvarınıza Hoş Geldiniz.</h1>
-                <p data-tr="hero-subtitle">OWASP Top 10, API Top 10 ve Automated Threats odaklı güncel güvenlik zafiyetlerini keşfedin, anlayın ve test edin.</p>
-                <a href="#test-section" class="btn">Testlere Başla</a>
+                <h1 data-i18n="hero_title">Web Güvenliği Laboratuvarı</h1>
+                <p data-i18n="hero_subtitle">OWASP Top 10, API güvenliği ve otomatik tehditleri test etmek için geliştirilmiş modern simülasyon ortamı.</p>
+                <a href="#test-section" class="btn" data-i18n="hero_btn">Testlere Başla</a>
             </div>
         </section>
 
         <section id="test-section">
             <div class="container">
-                <h2 data-tr="section-tests-title">Popüler Güvenlik Testleri</h2>
+                <h2 data-i18n="section_tests_title">Popüler Güvenlik Testleri</h2>
 
                 <div class="test-grid">
-
                     <div class="test-card">
-                        <h3 data-tr="card-sql-title">Test SQL Injection</h3>
-                        <p data-tr="card-sql-desc">En sık rastlanan zafiyetlerden birini test edin. Veritabanı sorgularının nasıl manipüle edilebileceğini görün.</p>
-                        <a href="test-sql-injection.html" class="btn" data-tr="card-sql-btn">Testi Başlat</a>
-                    </div>
-
-                    <div class="test-card">
-                        <h3 data-tr="card-xss-title">Test XSS (Cross-Site Scripting)</h3>
-                        <p data-tr="card-xss-desc">Kötü amaçlı istemci tarafı betiklerin bir kullanıcıya nasıl enjekte edilebileceğini keşfedin.</p>
-                        <a href="test-xss.html" class="btn" data-tr="card-xss-btn">Testi Başlat</a>
+                        <h3 data-i18n="card_sql_title">Test SQL Injection</h3>
+                        <p data-i18n="card_sql_desc">Veritabanı sorgularını manipüle ederek yetkisiz veri erişimini test edin.</p>
+                        <a href="test-sql-injection.html" class="btn" data-i18n="btn_start">Testi Başlat</a>
                     </div>
 
                     <div class="test-card">
-                        <h3 data-tr="card-ldap-title">Test LDAP Injection</h3>
-                        <p data-tr="card-ldap-desc">Dizin hizmetlerine (LDAP) yapılan sorgularda yetkilendirme ve kimlik doğrulama zafiyetlerini gözlemleyin.</p>
-                        <a href="test-ldap-injection.html" class="btn" data-tr="card-ldap-btn">Testi Başlat</a>
+                        <h3 data-i18n="card_xss_title">Test XSS (Cross-Site Scripting)</h3>
+                        <p data-i18n="card_xss_desc">Tarayıcı tabanlı saldırıları ve zararlı script enjeksiyonlarını simüle edin.</p>
+                        <a href="test-xss.html" class="btn" data-i18n="btn_start">Testi Başlat</a>
                     </div>
 
                     <div class="test-card">
-                        <h3 data-tr="card-payment-title">API Testi: Ödeme İşlemi</h3>
-                        <p data-tr="card-payment-desc">API güvenliği zafiyetlerini (Örn: BOLA) test etmek için tasarlanmış sahte ödeme işlemini gözden geçirin.</p>
-                        <a href="api-test-payment.html" class="btn" data-tr="card-payment-btn">Ödeme Sayfasına Git</a>
+                        <h3 data-i18n="card_ldap_title">Test LDAP Injection</h3>
+                        <p data-i18n="card_ldap_desc">Dizin hizmetlerine yapılan yetkisiz sorgu manipülasyonlarını inceleyin.</p>
+                        <a href="#" class="btn" data-i18n="btn_start">Testi Başlat</a>
                     </div>
 
                     <div class="test-card">
-                        <h3 data-tr="card-brute-title">Test Brute Force</h3>
-                        <p data-tr="card-brute-desc">Kimlik doğrulama mekanizmalarının parola denemelerine karşı ne kadar dayanıklı olduğunu ölçün.</p>
-                        <a href="test-brute-force.html" class="btn" data-tr="card-brute-btn">Testi Başlat</a>
+                        <h3 data-i18n="card_api_title">API: Ödeme Manipülasyonu</h3>
+                        <p data-i18n="card_api_desc">API endpointlerindeki veri bütünlüğü ve parametre manipülasyonu açıklarını test edin.</p>
+                        <a href="#" class="btn" data-i18n="btn_payment">Ödeme Yap</a>
                     </div>
-
+                    
+                    <div class="test-card">
+                        <h3 data-i18n="card_brute_title">Test Brute Force</h3>
+                        <p data-i18n="card_brute_desc">Giriş mekanizmalarının kaba kuvvet saldırılarına karşı direncini ölçün.</p>
+                        <a href="#" class="btn" data-i18n="btn_start">Testi Başlat</a>
                     </div>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
         <div class="container">
-            <p data-tr="footer-text">© 2025 Security Lab. Eğitim ve Test Amaçlıdır.</p>
+            <p data-i18n="footer_text">© 2025 Security Lab. Sadece eğitim ve yasal test amaçlıdır.</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
-
 </body>
 </html>
