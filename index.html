@@ -3,48 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Testing Lab</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Security Testing Lab - Kapsamlı Güvenlik Test Platformu</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .navbar { background: rgba(255,255,255,0.98); padding: 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .navbar .container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .nav-brand { font-size: 1.5rem; font-weight: 700; color: #667eea; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1f2937; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        
+        .navbar { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); padding: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .navbar .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .nav-brand { font-size: 1.6rem; font-weight: 800; color: #667eea; display: flex; align-items: center; gap: 0.5rem; }
+        .vulnerability-badge { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; animation: pulse 2s infinite; box-shadow: 0 2px 8px rgba(220,38,38,0.3); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
         .nav-menu { display: flex; list-style: none; gap: 0.5rem; flex-wrap: wrap; }
-        .nav-menu a { color: #1f2937; text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; background: #f3f4f6; font-weight: 500; transition: 0.3s; }
-        .nav-menu a:hover { background: #667eea; color: white; }
-        .language-selector { margin-left: auto; }
-        .language-selector select { padding: 0.6rem 1rem; border: 2px solid #667eea; border-radius: 8px; background: white; font-weight: 600; cursor: pointer; }
-        .hero { background: white; padding: 3rem 2rem; border-radius: 20px; margin: 2rem auto; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-width: 1400px; }
-        .hero h1 { font-size: 2.5rem; color: #1f2937; margin-bottom: 1rem; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 2rem; margin: 2rem auto; max-width: 1400px; padding: 0 20px; }
-        .test-card { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s; }
-        .test-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
-        .test-card h3 { color: #667eea; margin-bottom: 1rem; font-size: 1.4rem; }
-        .test-instructions { background: linear-gradient(135deg, #fef3c7, #fed7aa); border-left: 5px solid #f59e0b; padding: 1.5rem; margin: 1rem 0; border-radius: 10px; }
-        .test-instructions h4 { color: #92400e; margin-bottom: 0.8rem; }
-        .test-instructions ol { margin-left: 1.5rem; color: #78350f; }
-        .test-instructions code { background: #fed7aa; padding: 0.3rem 0.6rem; border-radius: 5px; font-family: monospace; color: #92400e; }
-        .test-input { width: 100%; padding: 0.8rem; border: 2px solid #d1d5db; border-radius: 8px; margin: 0.5rem 0; }
-        .btn { padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-block { width: 100%; display: block; margin: 0.5rem 0; }
+        .nav-menu a { color: #1f2937; text-decoration: none; padding: 0.7rem 1.2rem; border-radius: 10px; background: #f3f4f6; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+        .nav-menu a:hover { background: #667eea; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        
+        .language-selector select { padding: 0.7rem 1.2rem; border: 2px solid #667eea; border-radius: 10px; background: white; color: #1f2937; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .language-selector select:hover { background: #667eea; color: white; transform: translateY(-2px); }
+        
+        .hero { background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); padding: 4rem 2rem; border-radius: 25px; margin: 2rem auto; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.25); max-width: 1600px; border: 1px solid rgba(255,255,255,0.8); }
+        .hero h1 { font-size: 3rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; font-weight: 900; }
+        .hero p { font-size: 1.3rem; color: #6b7280; margin: 0.5rem 0; font-weight: 500; }
+        .hero .warning { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; padding: 1rem 2rem; border-radius: 15px; margin-top: 2rem; display: inline-block; font-weight: 700; border: 2px solid #dc2626; }
+        
+        .category-section { max-width: 1600px; margin: 3rem auto; padding: 0 20px; }
+        .category-section h2 { font-size: 2rem; color: white; margin-bottom: 2rem; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+        .test-card { background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); border-radius: 20px; padding: 2.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: all 0.4s; border: 1px solid rgba(255,255,255,0.8); position: relative; overflow: hidden; }
+        .test-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #667eea, #764ba2); }
+        .test-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        
+        .test-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .test-card-icon { font-size: 3rem; }
+        .test-card-title { font-size: 1.5rem; font-weight: 800; color: #1f2937; margin: 0; }
+        .test-card-subtitle { font-size: 0.95rem; color: #6b7280; margin-top: 0.5rem; }
+        
+        .severity-badge { display: inline-block; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-top: 0.5rem; }
+        .severity-critical { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; }
+        .severity-high { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .severity-medium { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        
+        .test-steps { background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); border-left: 5px solid #f59e0b; padding: 1.5rem; margin: 1.5rem 0; border-radius: 12px; }
+        .test-steps h4 { color: #92400e; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .test-steps ol { margin-left: 1.5rem; color: #78350f; font-weight: 500; }
+        .test-steps li { margin: 0.7rem 0; padding: 0.3rem 0; }
+        .test-steps code { background: #fed7aa; padding: 0.3rem 0.7rem; border-radius: 6px; font-family: 'Courier New', monospace; color: #92400e; font-weight: 700; border: 1px solid #fdba74; }
+        
+        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 700; transition: all 0.3s; cursor: pointer; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102,126,234,0.5); }
+        .btn-danger { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; }
+        .btn-danger:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(220,38,38,0.5); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-block { width: 100%; text-align: center; margin: 0.5rem 0; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .stat-box { background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: #667eea; }
+        .stat-label { color: #6b7280; font-weight: 600; margin-top: 0.5rem; }
+        
+        .footer { background: rgba(255,255,255,0.95); padding: 3rem 2rem; text-align: center; margin-top: 4rem; border-radius: 25px 25px 0 0; }
+        .footer p { color: #6b7280; margin: 0.7rem 0; font-weight: 500; }
+        .footer a { color: #667eea; text-decoration: none; font-weight: 700; }
+        .footer a:hover { text-decoration: underline; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .nav-menu { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">🔐 Security Lab</div>
+            <div class="nav-brand">
+                🔐 Security Lab
+                <span class="vulnerability-badge">VULNERABLE</span>
+            </div>
             <ul class="nav-menu">
                 <li><a href="index.html">🏠 Ana Sayfa</a></li>
-                <li><a href="login.html">🔑 Giriş</a></li>
-                <li><a href="payment.html">💳 Ödeme</a></li>
-                <li><a href="search.html">🔍 Arama</a></li>
+                <li><a href="search.html">💉 SQL Injection</a></li>
+                <li><a href="login.html">🔐 Authentication</a></li>
+                <li><a href="payment.html">💳 Payment</a></li>
+                <li><a href="profile.html">🔓 IDOR</a></li>
             </ul>
             <div class="language-selector">
-                <select id="languageSelect" onchange="changeLanguage(this.value)">
+                <select id="languageSelect" onchange="localStorage.setItem('language',this.value)">
                     <option value="tr">🇹🇷 Türkçe</option>
                     <option value="en">🇬🇧 English</option>
                     <option value="fr">🇫🇷 Français</option>
@@ -54,81 +100,183 @@
         </div>
     </nav>
 
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <div class="hero">
-            <h1>🎯 Güvenlik Test Laboratuvarı</h1>
-            <p>OWASP Top 10 | PCI DSS | API Testing</p>
+    <div class="hero">
+        <h1>🎯 Kapsamlı Güvenlik Test Laboratuvarı</h1>
+        <p><strong>OWASP Top 10</strong> • <strong>API Security Top 10</strong> • <strong>Automated Threats Top 21</strong> • <strong>PCI DSS</strong></p>
+        <p style="margin-top: 1rem;">Tüm testler canlı ve interaktif! Her zafiyet için adım adım rehber.</p>
+        <div class="warning">
+            ⚠️ Bu site KASITLI OLARAK güvenlik zafiyetleri içermektedir<br>Sadece eğitim ve test amaçlıdır - Gerçek bilgilerinizi GİRMEYİN!
         </div>
+    </div>
 
+    <div class="stats-grid" style="max-width: 1600px; margin: 2rem auto; padding: 0 20px;">
+        <div class="stat-box">
+            <div class="stat-number">31+</div>
+            <div class="stat-label">Test Kategorisi</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Zafiyet Noktası</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Dil Desteği</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Güvenlik Önlemi 😈</div>
+        </div>
+    </div>
+
+    <div class="category-section">
+        <h2>🔓 OWASP Top 10 (2021) - Hızlı Erişim</h2>
         <div class="cards-grid">
             <div class="test-card">
-                <h3>💉 SQL Injection</h3>
-                <div class="test-instructions">
-                    <h4>🎯 Test Adımları:</h4>
+                <div class="test-card-header">
+                    <div class="test-card-icon">💉</div>
+                    <div>
+                        <h3 class="test-card-title">SQL Injection</h3>
+                        <div class="severity-badge severity-critical">CRITICAL</div>
+                    </div>
+                </div>
+                <p class="test-card-subtitle">Veritabanı sorgularını manipüle et, tüm verilere eriş</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
                     <ol>
-                        <li><a href="search.html" style="color:#667eea;font-weight:600">Arama sayfasına</a> git</li>
-                        <li>Buraya yaz: <code>' OR '1'='1</code></li>
+                        <li>Arama sayfasına git</li>
+                        <li>Şunu yaz: <code>' OR '1'='1</code></li>
                         <li>Enter'a bas</li>
                         <li>✅ Tüm kullanıcıları göreceksin!</li>
                     </ol>
-                    <input type="text" class="test-input" placeholder="Buradan test et: ' OR '1'='1" id="sqlTest">
-                    <button class="btn btn-danger btn-block" onclick="window.location.href='search.html?q='+encodeURIComponent(document.getElementById('sqlTest').value||\"' OR '1'='1\")">SQL Injection Test Et</button>
                 </div>
+                <a href="search.html" class="btn btn-danger btn-block">SQL Injection Test Et →</a>
             </div>
 
             <div class="test-card">
-                <h3>💳 Ödeme Güvenliği (PCI DSS)</h3>
-                <div class="test-instructions">
-                    <h4>🎯 Test Adımları:</h4>
+                <div class="test-card-header">
+                    <div class="test-card-icon">🔓</div>
+                    <div>
+                        <h3 class="test-card-title">IDOR (Access Control)</h3>
+                        <div class="severity-badge severity-critical">CRITICAL</div>
+                    </div>
+                </div>
+                <p class="test-card-subtitle">Başka kullanıcıların verilerine yetkisiz erişim</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
                     <ol>
-                        <li><a href="payment.html" style="color:#667eea;font-weight:600">Ödeme sayfasına</a> git</li>
-                        <li>"Test Kartı Doldur" butonuna tıkla</li>
+                        <li>Profil sayfasına git</li>
+                        <li>URL'de <code>?user=1</code> gör</li>
+                        <li><code>?user=2</code> veya <code>?user=3</code> yap</li>
+                        <li>✅ Başka kullanıcıların tüm bilgileri!</li>
+                    </ol>
+                </div>
+                <a href="profile.html?user=1" class="btn btn-danger btn-block">IDOR Test Et →</a>
+            </div>
+
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-card-icon">🔐</div>
+                    <div>
+                        <h3 class="test-card-title">Authentication Bypass</h3>
+                        <div class="severity-badge severity-high">HIGH</div>
+                    </div>
+                </div>
+                <p class="test-card-subtitle">Brute force, session hijacking, credential stuffing</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
+                    <ol>
+                        <li>Login sayfasına git</li>
+                        <li>F12 aç → Console</li>
+                        <li>Yaz: <code>authDebug.bypassAuth()</code></li>
+                        <li>✅ Giriş yapmadan admin oldun!</li>
+                    </ol>
+                </div>
+                <a href="login.html" class="btn btn-danger btn-block">Authentication Test Et →</a>
+            </div>
+
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-card-icon">💳</div>
+                    <div>
+                        <h3 class="test-card-title">Payment Security (PCI DSS)</h3>
+                        <div class="severity-badge severity-critical">CRITICAL</div>
+                    </div>
+                </div>
+                <p class="test-card-subtitle">CVV storage, kart bilgisi sızması, brute force</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
+                    <ol>
+                        <li>Ödeme sayfasına git</li>
+                        <li>"Test Kartı Doldur" tıkla</li>
                         <li>"Kartımı kaydet" işaretle</li>
                         <li>Ödeme yap</li>
-                        <li>F12 aç → Application → Local Storage</li>
-                        <li>✅ CVV bile saklanmış göreceksin!</li>
+                        <li>F12 → Application → Local Storage</li>
+                        <li>✅ CVV bile saklanmış!</li>
                     </ol>
-                    <button class="btn btn-primary btn-block" onclick="window.location.href='payment.html'">Ödeme Testine Başla</button>
                 </div>
+                <a href="payment.html" class="btn btn-success btn-block">Payment Test Et →</a>
             </div>
 
             <div class="test-card">
-                <h3>🔓 IDOR (Profil Erişimi)</h3>
-                <div class="test-instructions">
-                    <h4>🎯 Test Adımları:</h4>
-                    <ol>
-                        <li><a href="profile.html?user=1" style="color:#667eea;font-weight:600">Profil sayfasına</a> git</li>
-                        <li>URL'deki <code>?user=1</code> değiştir</li>
-                        <li><code>?user=2</code> veya <code>?user=3</code> yaz</li>
-                        <li>✅ Başkalarının profilini göreceksin!</li>
-                    </ol>
-                    <input type="number" class="test-input" placeholder="Kullanıcı ID (1,2,3)" id="idorTest" value="2">
-                    <button class="btn btn-danger btn-block" onclick="window.location.href='profile.html?user='+document.getElementById('idorTest').value">Profili Görüntüle</button>
+                <div class="test-card-header">
+                    <div class="test-card-icon">🔢</div>
+                    <div>
+                        <h3 class="test-card-title">CVV Brute Force</h3>
+                        <div class="severity-badge severity-high">HIGH</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="test-card">
-                <h3>🔢 CVV Brute Force</h3>
-                <div class="test-instructions">
-                    <h4>🎯 Test Adımları:</h4>
+                <p class="test-card-subtitle">1000 CVV denemesi - Rate limiting YOK!</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
                     <ol>
-                        <li><a href="payment.html" style="color:#667eea;font-weight:600">Ödeme sayfasına</a> git</li>
+                        <li>Ödeme sayfasına git</li>
                         <li>Aşağı kaydır</li>
                         <li>"Brute Force Başlat" butonunu bul</li>
                         <li>Tıkla ve izle</li>
-                        <li>✅ 1000 CVV deneniyor - rate limit yok!</li>
+                        <li>✅ Saniyeler içinde doğru CVV bulundu!</li>
                     </ol>
-                    <button class="btn btn-danger btn-block" onclick="window.location.href='payment.html#brute'">CVV Brute Force →</button>
                 </div>
+                <a href="payment.html" class="btn btn-danger btn-block">CVV Brute Force →</a>
+            </div>
+
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-card-icon">📁</div>
+                    <div>
+                        <h3 class="test-card-title">File Upload Bypass</h3>
+                        <div class="severity-badge severity-critical">CRITICAL</div>
+                    </div>
+                </div>
+                <p class="test-card-subtitle">Arbitrary file upload, RCE, path traversal</p>
+                <div class="test-steps">
+                    <h4>🎯 Hızlı Test:</h4>
+                    <ol>
+                        <li>Upload sayfasına git</li>
+                        <li>Herhangi bir dosya seç</li>
+                        <li>Dosya adını <code>../../shell.php</code> yap</li>
+                        <li>Yükle</li>
+                        <li>✅ Path traversal başarılı!</li>
+                    </ol>
+                </div>
+                <a href="upload.html" class="btn btn-danger btn-block">File Upload Test Et →</a>
             </div>
         </div>
     </div>
 
-    <script src="js/i18n.js"></script>
+    <div class="footer">
+        <p><strong>🔓 Deliberately Vulnerable Application for Security Testing</strong></p>
+        <p>Bu platform eğitim amaçlıdır. Gerçek kart bilgilerinizi veya kişisel verilerinizi GİRMEYİN!</p>
+        <p style="margin-top: 1.5rem;">
+            <a href="https://owasp.org/Top10/">OWASP Top 10</a> •
+            <a href="https://owasp.org/API-Security/editions/2023/en/0x11-t10/">API Security Top 10</a> •
+            <a href="https://owasp.org/www-project-automated-threats-to-web-applications/">Automated Threats</a> •
+            <a href="https://www.pcisecuritystandards.org/">PCI DSS</a>
+        </p>
+    </div>
+
     <script>
         const savedLang = localStorage.getItem('language') || 'tr';
         document.getElementById('languageSelect').value = savedLang;
-        if (typeof changeLanguage === 'function') changeLanguage(savedLang);
     </script>
 </body>
 </html>
