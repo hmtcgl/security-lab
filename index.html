@@ -3,75 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Testing Lab - Kapsamlı Güvenlik Test Platformu</title>
+    <title>Security Lab - Professional Penetration Testing Platform</title>
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1f2937; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
         
-        .navbar { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); padding: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .navbar .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .nav-brand { font-size: 1.6rem; font-weight: 800; color: #667eea; display: flex; align-items: center; gap: 0.5rem; }
-        .vulnerability-badge { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; animation: pulse 2s infinite; box-shadow: 0 2px 8px rgba(220,38,38,0.3); }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: var(--gray-900); 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+        }
         
-        .nav-menu { display: flex; list-style: none; gap: 0.5rem; flex-wrap: wrap; }
-        .nav-menu a { color: #1f2937; text-decoration: none; padding: 0.7rem 1.2rem; border-radius: 10px; background: #f3f4f6; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
-        .nav-menu a:hover { background: #667eea; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.25rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
         
-        .language-selector select { padding: 0.7rem 1.2rem; border: 2px solid #667eea; border-radius: 10px; background: white; color: #1f2937; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .language-selector select:hover { background: #667eea; color: white; transform: translateY(-2px); }
+        .navbar .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
         
-        .hero { background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); padding: 4rem 2rem; border-radius: 25px; margin: 2rem auto; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.25); max-width: 1600px; border: 1px solid rgba(255,255,255,0.8); }
-        .hero h1 { font-size: 3rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; font-weight: 900; }
-        .hero p { font-size: 1.3rem; color: #6b7280; margin: 0.5rem 0; font-weight: 500; }
-        .hero .warning { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; padding: 1rem 2rem; border-radius: 15px; margin-top: 2rem; display: inline-block; font-weight: 700; border: 2px solid #dc2626; }
+        .nav-brand {
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.5px;
+        }
         
-        .category-section { max-width: 1600px; margin: 3rem auto; padding: 0 20px; }
-        .category-section h2 { font-size: 2rem; color: white; margin-bottom: 2rem; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .vulnerability-badge {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            padding: 0.375rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
         
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-        .test-card { background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); border-radius: 20px; padding: 2.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: all 0.4s; border: 1px solid rgba(255,255,255,0.8); position: relative; overflow: hidden; }
-        .test-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #667eea, #764ba2); }
-        .test-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.05); }
+        }
         
-        .test-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-        .test-card-icon { font-size: 3rem; }
-        .test-card-title { font-size: 1.5rem; font-weight: 800; color: #1f2937; margin: 0; }
-        .test-card-subtitle { font-size: 0.95rem; color: #6b7280; margin-top: 0.5rem; }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
         
-        .severity-badge { display: inline-block; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-top: 0.5rem; }
-        .severity-critical { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; }
-        .severity-high { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .severity-medium { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .nav-menu a {
+            color: var(--gray-600);
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            background: var(--gray-50);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 2px solid transparent;
+        }
         
-        .test-steps { background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); border-left: 5px solid #f59e0b; padding: 1.5rem; margin: 1.5rem 0; border-radius: 12px; }
-        .test-steps h4 { color: #92400e; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-        .test-steps ol { margin-left: 1.5rem; color: #78350f; font-weight: 500; }
-        .test-steps li { margin: 0.7rem 0; padding: 0.3rem 0; }
-        .test-steps code { background: #fed7aa; padding: 0.3rem 0.7rem; border-radius: 6px; font-family: 'Courier New', monospace; color: #92400e; font-weight: 700; border: 1px solid #fdba74; }
+        .nav-menu a:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
         
-        .btn { display: inline-block; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 700; transition: all 0.3s; cursor: pointer; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102,126,234,0.5); }
-        .btn-danger { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; }
-        .btn-danger:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(220,38,38,0.5); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .btn-block { width: 100%; text-align: center; margin: 0.5rem 0; }
+        .language-selector select {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            background: white;
+            color: var(--dark);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+            appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+        }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .stat-box { background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .stat-number { font-size: 2.5rem; font-weight: 800; color: #667eea; }
-        .stat-label { color: #6b7280; font-weight: 600; margin-top: 0.5rem; }
+        .language-selector select:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
         
-        .footer { background: rgba(255,255,255,0.95); padding: 3rem 2rem; text-align: center; margin-top: 4rem; border-radius: 25px 25px 0 0; }
-        .footer p { color: #6b7280; margin: 0.7rem 0; font-weight: 500; }
-        .footer a { color: #667eea; text-decoration: none; font-weight: 700; }
-        .footer a:hover { text-decoration: underline; }
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+            backdrop-filter: blur(20px);
+            padding: 5rem 2.5rem;
+            border-radius: 30px;
+            margin: 3rem auto;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+            max-width: 1400px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
         
+        .hero h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.5rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .hero .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .hero .feature-badge {
+            background: linear-gradient(135deg, var(--gray-50), white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--gray-100);
+        }
+        
+        .hero .warning-box {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            margin-top: 2.5rem;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid #dc2626;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 700;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Category Section */
+        .category-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+        
+        .category-section h2 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 3rem;
+            font-weight: 900;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+        }
+        
+        /* Test Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .test-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        .test-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+        }
+        
+        .test-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-card-icon {
+            font-size: 4rem;
+            line-height: 1;
+        }
+        
+        .test-card-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+            line-height: 1.3;
+        }
+        
+        .test-card-subtitle {
+            font-size: 1.05rem;
+            color: var(--gray-600);
+            margin-top: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-top: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .severity-critical {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+        }
+        
+        .severity-high {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .severity-medium {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        /* Test Steps */
+        .test-steps {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-left: 6px solid var(--warning);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+        }
+        
+        .test-steps h4 {
+            color: #92400e;
+            margin-bottom: 1.25rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .test-steps ol {
+            margin-left: 1.75rem;
+            color: #78350f;
+            font-weight: 600;
+        }
+        
+        .test-steps li {
+            margin: 1rem 0;
+            padding: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .test-steps code {
+            background: #fed7aa;
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: #92400e;
+            font-weight: 800;
+            border: 2px solid #fdba74;
+            font-size: 0.95rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 1.25rem 2.5rem;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-block {
+            width: 100%;
+            text-align: center;
+            margin: 0.75rem 0;
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 4rem 2.5rem;
+            text-align: center;
+            margin-top: 5rem;
+            border-radius: 30px 30px 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .footer p {
+            color: var(--gray-600);
+            margin: 1rem 0;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 800;
+            transition: all 0.3s;
+        }
+        
+        .footer a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
+            .hero h1 { font-size: 2.5rem; }
             .cards-grid { grid-template-columns: 1fr; }
             .nav-menu { width: 100%; justify-content: center; }
+            .test-card { padding: 2rem; }
         }
     </style>
 </head>
@@ -79,18 +488,18 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                🔐 Security Lab
-                <span class="vulnerability-badge">VULNERABLE</span>
+                🔐 <span data-i18n="brand">Security Lab</span>
+                <span class="vulnerability-badge" data-i18n="vulnerable">VULNERABLE</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="index.html">🏠 Ana Sayfa</a></li>
-                <li><a href="search.html">💉 SQL Injection</a></li>
-                <li><a href="login.html">🔐 Authentication</a></li>
-                <li><a href="payment.html">💳 Payment</a></li>
-                <li><a href="profile.html">🔓 IDOR</a></li>
+                <li><a href="index.html">🏠 <span data-i18n="nav-home">Ana Sayfa</span></a></li>
+                <li><a href="search.html">💉 <span data-i18n="nav-sql">SQL Injection</span></a></li>
+                <li><a href="login.html">🔐 <span data-i18n="nav-auth">Authentication</span></a></li>
+                <li><a href="payment.html">💳 <span data-i18n="nav-payment">Payment</span></a></li>
+                <li><a href="profile.html">🔓 <span data-i18n="nav-idor">IDOR</span></a></li>
             </ul>
             <div class="language-selector">
-                <select id="languageSelect" onchange="localStorage.setItem('language',this.value)">
+                <select id="languageSelect">
                     <option value="tr">🇹🇷 Türkçe</option>
                     <option value="en">🇬🇧 English</option>
                     <option value="fr">🇫🇷 Français</option>
@@ -101,35 +510,43 @@
     </nav>
 
     <div class="hero">
-        <h1>🎯 Kapsamlı Güvenlik Test Laboratuvarı</h1>
-        <p><strong>OWASP Top 10</strong> • <strong>API Security Top 10</strong> • <strong>Automated Threats Top 21</strong> • <strong>PCI DSS</strong></p>
-        <p style="margin-top: 1rem;">Tüm testler canlı ve interaktif! Her zafiyet için adım adım rehber.</p>
-        <div class="warning">
-            ⚠️ Bu site KASITLI OLARAK güvenlik zafiyetleri içermektedir<br>Sadece eğitim ve test amaçlıdır - Gerçek bilgilerinizi GİRMEYİN!
+        <h1 data-i18n="hero-title">Kapsamlı Güvenlik Test Laboratuvarı</h1>
+        <p class="subtitle" data-i18n="hero-subtitle">Profesyonel Penetrasyon Testi Platformu</p>
+        <div class="features">
+            <span class="feature-badge">OWASP Top 10</span>
+            <span class="feature-badge">API Security Top 10</span>
+            <span class="feature-badge">Automated Threats Top 21</span>
+            <span class="feature-badge">PCI DSS</span>
+        </div>
+        <p style="margin-top: 1.5rem; font-size: 1.1rem; color: var(--gray-600);" data-i18n="hero-description">
+            Tüm testler canlı ve interaktif! Her zafiyet için adım adım rehber.
+        </p>
+        <div class="warning-box">
+            ⚠️ <span data-i18n="warning">Bu site KASITLI OLARAK güvenlik zafiyetleri içermektedir<br>Sadece eğitim ve test amaçlıdır - Gerçek bilgilerinizi GİRMEYİN!</span>
         </div>
     </div>
 
-    <div class="stats-grid" style="max-width: 1600px; margin: 2rem auto; padding: 0 20px;">
+    <div class="stats-grid">
         <div class="stat-box">
             <div class="stat-number">31+</div>
-            <div class="stat-label">Test Kategorisi</div>
+            <div class="stat-label" data-i18n="stat-categories">Test Kategorisi</div>
         </div>
         <div class="stat-box">
             <div class="stat-number">100+</div>
-            <div class="stat-label">Zafiyet Noktası</div>
+            <div class="stat-label" data-i18n="stat-vulnerabilities">Zafiyet Noktası</div>
         </div>
         <div class="stat-box">
             <div class="stat-number">4</div>
-            <div class="stat-label">Dil Desteği</div>
+            <div class="stat-label" data-i18n="stat-languages">Dil Desteği</div>
         </div>
         <div class="stat-box">
             <div class="stat-number">0</div>
-            <div class="stat-label">Güvenlik Önlemi 😈</div>
+            <div class="stat-label" data-i18n="stat-security">Güvenlik Önlemi 😈</div>
         </div>
     </div>
 
     <div class="category-section">
-        <h2>🔓 OWASP Top 10 (2021) - Hızlı Erişim</h2>
+        <h2 data-i18n="section-owasp">🔓 OWASP Top 10 (2021) - Hızlı Erişim</h2>
         <div class="cards-grid">
             <div class="test-card">
                 <div class="test-card-header">
@@ -139,134 +556,134 @@
                         <div class="severity-badge severity-critical">CRITICAL</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">Veritabanı sorgularını manipüle et, tüm verilere eriş</p>
+                <p class="test-card-subtitle" data-i18n="sql-subtitle">Veritabanı sorgularını manipüle et, tüm verilere eriş</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Arama sayfasına git</li>
-                        <li>Şunu yaz: <code>' OR '1'='1</code></li>
-                        <li>Enter'a bas</li>
-                        <li>✅ Tüm kullanıcıları göreceksin!</li>
+                        <li data-i18n="sql-step1">Arama sayfasına git</li>
+                        <li><span data-i18n="sql-step2">Şunu yaz:</span> <code>' OR '1'='1</code></li>
+                        <li data-i18n="sql-step3">Enter'a bas</li>
+                        <li data-i18n="sql-step4">✅ Tüm kullanıcıları göreceksin!</li>
                     </ol>
                 </div>
-                <a href="search.html" class="btn btn-danger btn-block">SQL Injection Test Et →</a>
+                <a href="search.html" class="btn btn-danger btn-block" data-i18n="sql-button">SQL Injection Test Et →</a>
             </div>
 
             <div class="test-card">
                 <div class="test-card-header">
                     <div class="test-card-icon">🔓</div>
                     <div>
-                        <h3 class="test-card-title">IDOR (Access Control)</h3>
+                        <h3 class="test-card-title">IDOR</h3>
                         <div class="severity-badge severity-critical">CRITICAL</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">Başka kullanıcıların verilerine yetkisiz erişim</p>
+                <p class="test-card-subtitle" data-i18n="idor-subtitle">Başka kullanıcıların verilerine yetkisiz erişim</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Profil sayfasına git</li>
-                        <li>URL'de <code>?user=1</code> gör</li>
-                        <li><code>?user=2</code> veya <code>?user=3</code> yap</li>
-                        <li>✅ Başka kullanıcıların tüm bilgileri!</li>
+                        <li data-i18n="idor-step1">Profil sayfasına git</li>
+                        <li><span data-i18n="idor-step2">URL'de</span> <code>?user=1</code> <span data-i18n="idor-step2b">gör</span></li>
+                        <li><code>?user=2</code> <span data-i18n="idor-step3">veya</span> <code>?user=3</code> <span data-i18n="idor-step3b">yap</span></li>
+                        <li data-i18n="idor-step4">✅ Başka kullanıcıların tüm bilgileri!</li>
                     </ol>
                 </div>
-                <a href="profile.html?user=1" class="btn btn-danger btn-block">IDOR Test Et →</a>
+                <a href="profile.html?user=1" class="btn btn-danger btn-block" data-i18n="idor-button">IDOR Test Et →</a>
             </div>
 
             <div class="test-card">
                 <div class="test-card-header">
                     <div class="test-card-icon">🔐</div>
                     <div>
-                        <h3 class="test-card-title">Authentication Bypass</h3>
+                        <h3 class="test-card-title" data-i18n="auth-title">Authentication Bypass</h3>
                         <div class="severity-badge severity-high">HIGH</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">Brute force, session hijacking, credential stuffing</p>
+                <p class="test-card-subtitle" data-i18n="auth-subtitle">Brute force, session hijacking, credential stuffing</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Login sayfasına git</li>
-                        <li>F12 aç → Console</li>
-                        <li>Yaz: <code>authDebug.bypassAuth()</code></li>
-                        <li>✅ Giriş yapmadan admin oldun!</li>
+                        <li data-i18n="auth-step1">Login sayfasına git</li>
+                        <li><span data-i18n="auth-step2">F12 aç → Console</span></li>
+                        <li><span data-i18n="auth-step3">Yaz:</span> <code>authDebug.bypassAuth()</code></li>
+                        <li data-i18n="auth-step4">✅ Giriş yapmadan admin oldun!</li>
                     </ol>
                 </div>
-                <a href="login.html" class="btn btn-danger btn-block">Authentication Test Et →</a>
+                <a href="login.html" class="btn btn-danger btn-block" data-i18n="auth-button">Authentication Test Et →</a>
             </div>
 
             <div class="test-card">
                 <div class="test-card-header">
                     <div class="test-card-icon">💳</div>
                     <div>
-                        <h3 class="test-card-title">Payment Security (PCI DSS)</h3>
+                        <h3 class="test-card-title" data-i18n="payment-title">Payment Security</h3>
                         <div class="severity-badge severity-critical">CRITICAL</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">CVV storage, kart bilgisi sızması, brute force</p>
+                <p class="test-card-subtitle" data-i18n="payment-subtitle">CVV storage, kart bilgisi sızması, brute force</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Ödeme sayfasına git</li>
-                        <li>"Test Kartı Doldur" tıkla</li>
-                        <li>"Kartımı kaydet" işaretle</li>
-                        <li>Ödeme yap</li>
+                        <li data-i18n="payment-step1">Ödeme sayfasına git</li>
+                        <li data-i18n="payment-step2">"Test Kartı Doldur" tıkla</li>
+                        <li data-i18n="payment-step3">"Kartımı kaydet" işaretle</li>
+                        <li data-i18n="payment-step4">Ödeme yap</li>
                         <li>F12 → Application → Local Storage</li>
-                        <li>✅ CVV bile saklanmış!</li>
+                        <li data-i18n="payment-step6">✅ CVV bile saklanmış!</li>
                     </ol>
                 </div>
-                <a href="payment.html" class="btn btn-success btn-block">Payment Test Et →</a>
+                <a href="payment.html" class="btn btn-success btn-block" data-i18n="payment-button">Payment Test Et →</a>
             </div>
 
             <div class="test-card">
                 <div class="test-card-header">
                     <div class="test-card-icon">🔢</div>
                     <div>
-                        <h3 class="test-card-title">CVV Brute Force</h3>
+                        <h3 class="test-card-title" data-i18n="brute-title">CVV Brute Force</h3>
                         <div class="severity-badge severity-high">HIGH</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">1000 CVV denemesi - Rate limiting YOK!</p>
+                <p class="test-card-subtitle" data-i18n="brute-subtitle">1000 CVV denemesi - Rate limiting YOK!</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Ödeme sayfasına git</li>
-                        <li>Aşağı kaydır</li>
-                        <li>"Brute Force Başlat" butonunu bul</li>
-                        <li>Tıkla ve izle</li>
-                        <li>✅ Saniyeler içinde doğru CVV bulundu!</li>
+                        <li data-i18n="brute-step1">Ödeme sayfasına git</li>
+                        <li data-i18n="brute-step2">Aşağı kaydır</li>
+                        <li data-i18n="brute-step3">"Brute Force Başlat" butonunu bul</li>
+                        <li data-i18n="brute-step4">Tıkla ve izle</li>
+                        <li data-i18n="brute-step5">✅ Saniyeler içinde doğru CVV bulundu!</li>
                     </ol>
                 </div>
-                <a href="payment.html" class="btn btn-danger btn-block">CVV Brute Force →</a>
+                <a href="payment.html" class="btn btn-danger btn-block" data-i18n="brute-button">CVV Brute Force →</a>
             </div>
 
             <div class="test-card">
                 <div class="test-card-header">
                     <div class="test-card-icon">📁</div>
                     <div>
-                        <h3 class="test-card-title">File Upload Bypass</h3>
+                        <h3 class="test-card-title" data-i18n="upload-title">File Upload Bypass</h3>
                         <div class="severity-badge severity-critical">CRITICAL</div>
                     </div>
                 </div>
-                <p class="test-card-subtitle">Arbitrary file upload, RCE, path traversal</p>
+                <p class="test-card-subtitle" data-i18n="upload-subtitle">Arbitrary file upload, RCE, path traversal</p>
                 <div class="test-steps">
-                    <h4>🎯 Hızlı Test:</h4>
+                    <h4>🎯 <span data-i18n="quick-test">Hızlı Test:</span></h4>
                     <ol>
-                        <li>Upload sayfasına git</li>
-                        <li>Herhangi bir dosya seç</li>
-                        <li>Dosya adını <code>../../shell.php</code> yap</li>
-                        <li>Yükle</li>
-                        <li>✅ Path traversal başarılı!</li>
+                        <li data-i18n="upload-step1">Upload sayfasına git</li>
+                        <li data-i18n="upload-step2">Herhangi bir dosya seç</li>
+                        <li><span data-i18n="upload-step3">Dosya adını</span> <code>../../shell.php</code> <span data-i18n="upload-step3b">yap</span></li>
+                        <li data-i18n="upload-step4">Yükle</li>
+                        <li data-i18n="upload-step5">✅ Path traversal başarılı!</li>
                     </ol>
                 </div>
-                <a href="upload.html" class="btn btn-danger btn-block">File Upload Test Et →</a>
+                <a href="upload.html" class="btn btn-danger btn-block" data-i18n="upload-button">File Upload Test Et →</a>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p><strong>🔓 Deliberately Vulnerable Application for Security Testing</strong></p>
-        <p>Bu platform eğitim amaçlıdır. Gerçek kart bilgilerinizi veya kişisel verilerinizi GİRMEYİN!</p>
-        <p style="margin-top: 1.5rem;">
+        <p><strong data-i18n="footer-title">🔓 Deliberately Vulnerable Application for Security Testing</strong></p>
+        <p data-i18n="footer-warning">Bu platform eğitim amaçlıdır. Gerçek kart bilgilerinizi veya kişisel verilerinizi GİRMEYİN!</p>
+        <p style="margin-top: 2rem;">
             <a href="https://owasp.org/Top10/">OWASP Top 10</a> •
             <a href="https://owasp.org/API-Security/editions/2023/en/0x11-t10/">API Security Top 10</a> •
             <a href="https://owasp.org/www-project-automated-threats-to-web-applications/">Automated Threats</a> •
@@ -275,8 +692,313 @@
     </div>
 
     <script>
-        const savedLang = localStorage.getItem('language') || 'tr';
-        document.getElementById('languageSelect').value = savedLang;
+        // Çoklu Dil Desteği - Tam Çalışan Versiyon
+        const translations = {
+            tr: {
+                "brand": "Security Lab",
+                "vulnerable": "ZAFİYETLİ",
+                "nav-home": "Ana Sayfa",
+                "nav-sql": "SQL Injection",
+                "nav-auth": "Authentication",
+                "nav-payment": "Ödeme",
+                "nav-idor": "IDOR",
+                "hero-title": "Kapsamlı Güvenlik Test Laboratuvarı",
+                "hero-subtitle": "Profesyonel Penetrasyon Testi Platformu",
+                "hero-description": "Tüm testler canlı ve interaktif! Her zafiyet için adım adım rehber.",
+                "warning": "Bu site KASITLI OLARAK güvenlik zafiyetleri içermektedir<br>Sadece eğitim ve test amaçlıdır - Gerçek bilgilerinizi GİRMEYİN!",
+                "stat-categories": "Test Kategorisi",
+                "stat-vulnerabilities": "Zafiyet Noktası",
+                "stat-languages": "Dil Desteği",
+                "stat-security": "Güvenlik Önlemi 😈",
+                "section-owasp": "🔓 OWASP Top 10 (2021) - Hızlı Erişim",
+                "sql-subtitle": "Veritabanı sorgularını manipüle et, tüm verilere eriş",
+                "quick-test": "Hızlı Test:",
+                "sql-step1": "Arama sayfasına git",
+                "sql-step2": "Şunu yaz:",
+                "sql-step3": "Enter'a bas",
+                "sql-step4": "✅ Tüm kullanıcıları göreceksin!",
+                "sql-button": "SQL Injection Test Et →",
+                "idor-subtitle": "Başka kullanıcıların verilerine yetkisiz erişim",
+                "idor-step1": "Profil sayfasına git",
+                "idor-step2": "URL'de",
+                "idor-step2b": "gör",
+                "idor-step3": "veya",
+                "idor-step3b": "yap",
+                "idor-step4": "✅ Başka kullanıcıların tüm bilgileri!",
+                "idor-button": "IDOR Test Et →",
+                "auth-title": "Authentication Bypass",
+                "auth-subtitle": "Brute force, session hijacking, credential stuffing",
+                "auth-step1": "Login sayfasına git",
+                "auth-step2": "F12 aç → Console",
+                "auth-step3": "Yaz:",
+                "auth-step4": "✅ Giriş yapmadan admin oldun!",
+                "auth-button": "Authentication Test Et →",
+                "payment-title": "Payment Security",
+                "payment-subtitle": "CVV storage, kart bilgisi sızması, brute force",
+                "payment-step1": "Ödeme sayfasına git",
+                "payment-step2": "\"Test Kartı Doldur\" tıkla",
+                "payment-step3": "\"Kartımı kaydet\" işaretle",
+                "payment-step4": "Ödeme yap",
+                "payment-step6": "✅ CVV bile saklanmış!",
+                "payment-button": "Payment Test Et →",
+                "brute-title": "CVV Brute Force",
+                "brute-subtitle": "1000 CVV denemesi - Rate limiting YOK!",
+                "brute-step1": "Ödeme sayfasına git",
+                "brute-step2": "Aşağı kaydır",
+                "brute-step3": "\"Brute Force Başlat\" butonunu bul",
+                "brute-step4": "Tıkla ve izle",
+                "brute-step5": "✅ Saniyeler içinde doğru CVV bulundu!",
+                "brute-button": "CVV Brute Force →",
+                "upload-title": "File Upload Bypass",
+                "upload-subtitle": "Arbitrary file upload, RCE, path traversal",
+                "upload-step1": "Upload sayfasına git",
+                "upload-step2": "Herhangi bir dosya seç",
+                "upload-step3": "Dosya adını",
+                "upload-step3b": "yap",
+                "upload-step4": "Yükle",
+                "upload-step5": "✅ Path traversal başarılı!",
+                "upload-button": "File Upload Test Et →",
+                "footer-title": "🔓 Deliberately Vulnerable Application for Security Testing",
+                "footer-warning": "Bu platform eğitim amaçlıdır. Gerçek kart bilgilerinizi veya kişisel verilerinizi GİRMEYİN!"
+            },
+            en: {
+                "brand": "Security Lab",
+                "vulnerable": "VULNERABLE",
+                "nav-home": "Home",
+                "nav-sql": "SQL Injection",
+                "nav-auth": "Authentication",
+                "nav-payment": "Payment",
+                "nav-idor": "IDOR",
+                "hero-title": "Comprehensive Security Testing Laboratory",
+                "hero-subtitle": "Professional Penetration Testing Platform",
+                "hero-description": "All tests are live and interactive! Step-by-step guide for each vulnerability.",
+                "warning": "This site INTENTIONALLY contains security vulnerabilities<br>For educational and testing purposes only - Do NOT enter real information!",
+                "stat-categories": "Test Categories",
+                "stat-vulnerabilities": "Vulnerability Points",
+                "stat-languages": "Language Support",
+                "stat-security": "Security Measures 😈",
+                "section-owasp": "🔓 OWASP Top 10 (2021) - Quick Access",
+                "sql-subtitle": "Manipulate database queries, access all data",
+                "quick-test": "Quick Test:",
+                "sql-step1": "Go to search page",
+                "sql-step2": "Type this:",
+                "sql-step3": "Press Enter",
+                "sql-step4": "✅ You'll see all users!",
+                "sql-button": "Test SQL Injection →",
+                "idor-subtitle": "Unauthorized access to other users' data",
+                "idor-step1": "Go to profile page",
+                "idor-step2": "See in URL",
+                "idor-step2b": "",
+                "idor-step3": "or",
+                "idor-step3b": "change to",
+                "idor-step4": "✅ All other users' information!",
+                "idor-button": "Test IDOR →",
+                "auth-title": "Authentication Bypass",
+                "auth-subtitle": "Brute force, session hijacking, credential stuffing",
+                "auth-step1": "Go to login page",
+                "auth-step2": "Open F12 → Console",
+                "auth-step3": "Type:",
+                "auth-step4": "✅ You're admin without logging in!",
+                "auth-button": "Test Authentication →",
+                "payment-title": "Payment Security",
+                "payment-subtitle": "CVV storage, card data leak, brute force",
+                "payment-step1": "Go to payment page",
+                "payment-step2": "Click \"Fill Test Card\"",
+                "payment-step3": "Check \"Save my card\"",
+                "payment-step4": "Make payment",
+                "payment-step6": "✅ Even CVV is stored!",
+                "payment-button": "Test Payment →",
+                "brute-title": "CVV Brute Force",
+                "brute-subtitle": "1000 CVV attempts - NO rate limiting!",
+                "brute-step1": "Go to payment page",
+                "brute-step2": "Scroll down",
+                "brute-step3": "Find \"Start Brute Force\" button",
+                "brute-step4": "Click and watch",
+                "brute-step5": "✅ Correct CVV found in seconds!",
+                "brute-button": "CVV Brute Force →",
+                "upload-title": "File Upload Bypass",
+                "upload-subtitle": "Arbitrary file upload, RCE, path traversal",
+                "upload-step1": "Go to upload page",
+                "upload-step2": "Select any file",
+                "upload-step3": "Rename file to",
+                "upload-step3b": "",
+                "upload-step4": "Upload",
+                "upload-step5": "✅ Path traversal successful!",
+                "upload-button": "Test File Upload →",
+                "footer-title": "🔓 Deliberately Vulnerable Application for Security Testing",
+                "footer-warning": "This platform is for educational purposes. Do NOT enter your real card information or personal data!"
+            },
+            fr: {
+                "brand": "Security Lab",
+                "vulnerable": "VULNÉRABLE",
+                "nav-home": "Accueil",
+                "nav-sql": "Injection SQL",
+                "nav-auth": "Authentification",
+                "nav-payment": "Paiement",
+                "nav-idor": "IDOR",
+                "hero-title": "Laboratoire de Tests de Sécurité Complet",
+                "hero-subtitle": "Plateforme Professionnelle de Tests de Pénétration",
+                "hero-description": "Tous les tests sont en direct et interactifs ! Guide étape par étape pour chaque vulnérabilité.",
+                "warning": "Ce site contient INTENTIONNELLEMENT des vulnérabilités de sécurité<br>À des fins éducatives et de test uniquement - N'entrez PAS de vraies informations !",
+                "stat-categories": "Catégories de Tests",
+                "stat-vulnerabilities": "Points de Vulnérabilité",
+                "stat-languages": "Support Linguistique",
+                "stat-security": "Mesures de Sécurité 😈",
+                "section-owasp": "🔓 OWASP Top 10 (2021) - Accès Rapide",
+                "sql-subtitle": "Manipuler les requêtes de base de données, accéder à toutes les données",
+                "quick-test": "Test Rapide:",
+                "sql-step1": "Aller à la page de recherche",
+                "sql-step2": "Tapez ceci:",
+                "sql-step3": "Appuyez sur Entrée",
+                "sql-step4": "✅ Vous verrez tous les utilisateurs !",
+                "sql-button": "Tester l'Injection SQL →",
+                "idor-subtitle": "Accès non autorisé aux données d'autres utilisateurs",
+                "idor-step1": "Aller à la page de profil",
+                "idor-step2": "Voir dans l'URL",
+                "idor-step2b": "",
+                "idor-step3": "ou",
+                "idor-step3b": "changer en",
+                "idor-step4": "✅ Toutes les informations des autres utilisateurs !",
+                "idor-button": "Tester IDOR →",
+                "auth-title": "Contournement d'Authentification",
+                "auth-subtitle": "Force brute, détournement de session, credential stuffing",
+                "auth-step1": "Aller à la page de connexion",
+                "auth-step2": "Ouvrir F12 → Console",
+                "auth-step3": "Tapez:",
+                "auth-step4": "✅ Vous êtes admin sans connexion !",
+                "auth-button": "Tester l'Authentification →",
+                "payment-title": "Sécurité des Paiements",
+                "payment-subtitle": "Stockage CVV, fuite de données de carte, force brute",
+                "payment-step1": "Aller à la page de paiement",
+                "payment-step2": "Cliquez sur \"Remplir la Carte de Test\"",
+                "payment-step3": "Cochez \"Enregistrer ma carte\"",
+                "payment-step4": "Effectuer le paiement",
+                "payment-step6": "✅ Même le CVV est stocké !",
+                "payment-button": "Tester le Paiement →",
+                "brute-title": "Force Brute CVV",
+                "brute-subtitle": "1000 tentatives CVV - AUCUNE limitation de débit !",
+                "brute-step1": "Aller à la page de paiement",
+                "brute-step2": "Faire défiler vers le bas",
+                "brute-step3": "Trouver le bouton \"Démarrer Force Brute\"",
+                "brute-step4": "Cliquer et regarder",
+                "brute-step5": "✅ CVV correct trouvé en quelques secondes !",
+                "brute-button": "Force Brute CVV →",
+                "upload-title": "Contournement de Téléchargement de Fichiers",
+                "upload-subtitle": "Téléchargement de fichiers arbitraires, RCE, traversée de chemin",
+                "upload-step1": "Aller à la page de téléchargement",
+                "upload-step2": "Sélectionner n'importe quel fichier",
+                "upload-step3": "Renommer le fichier en",
+                "upload-step3b": "",
+                "upload-step4": "Télécharger",
+                "upload-step5": "✅ Traversée de chemin réussie !",
+                "upload-button": "Tester le Téléchargement →",
+                "footer-title": "🔓 Application Délibérément Vulnérable pour Tests de Sécurité",
+                "footer-warning": "Cette plateforme est à des fins éducatives. N'entrez PAS vos vraies informations de carte ou données personnelles !"
+            },
+            ar: {
+                "brand": "مختبر الأمان",
+                "vulnerable": "ضعيف",
+                "nav-home": "الرئيسية",
+                "nav-sql": "حقن SQL",
+                "nav-auth": "المصادقة",
+                "nav-payment": "الدفع",
+                "nav-idor": "IDOR",
+                "hero-title": "مختبر اختبار أمان شامل",
+                "hero-subtitle": "منصة اختبار اختراق احترافية",
+                "hero-description": "جميع الاختبارات مباشرة وتفاعلية! دليل خطوة بخطوة لكل ثغرة.",
+                "warning": "يحتوي هذا الموقع عمداً على ثغرات أمنية<br>لأغراض تعليمية واختبار فقط - لا تدخل معلومات حقيقية!",
+                "stat-categories": "فئات الاختبار",
+                "stat-vulnerabilities": "نقاط الثغرات",
+                "stat-languages": "دعم اللغات",
+                "stat-security": "تدابير الأمان 😈",
+                "section-owasp": "🔓 OWASP أفضل 10 (2021) - وصول سريع",
+                "sql-subtitle": "التلاعب باستعلامات قاعدة البيانات، الوصول إلى جميع البيانات",
+                "quick-test": "اختبار سريع:",
+                "sql-step1": "انتقل إلى صفحة البحث",
+                "sql-step2": "اكتب هذا:",
+                "sql-step3": "اضغط Enter",
+                "sql-step4": "✅ سترى جميع المستخدمين!",
+                "sql-button": "اختبر حقن SQL ←",
+                "idor-subtitle": "وصول غير مصرح به إلى بيانات المستخدمين الآخرين",
+                "idor-step1": "انتقل إلى صفحة الملف الشخصي",
+                "idor-step2": "انظر في عنوان URL",
+                "idor-step2b": "",
+                "idor-step3": "أو",
+                "idor-step3b": "غير إلى",
+                "idor-step4": "✅ جميع معلومات المستخدمين الآخرين!",
+                "idor-button": "اختبر IDOR ←",
+                "auth-title": "تجاوز المصادقة",
+                "auth-subtitle": "القوة الغاشمة، اختطاف الجلسة، حشو بيانات الاعتماد",
+                "auth-step1": "انتقل إلى صفحة تسجيل الدخول",
+                "auth-step2": "افتح F12 ← Console",
+                "auth-step3": "اكتب:",
+                "auth-step4": "✅ أنت مسؤول بدون تسجيل الدخول!",
+                "auth-button": "اختبر المصادقة ←",
+                "payment-title": "أمان الدفع",
+                "payment-subtitle": "تخزين CVV، تسرب بيانات البطاقة، القوة الغاشمة",
+                "payment-step1": "انتقل إلى صفحة الدفع",
+                "payment-step2": "انقر على \"ملء بطاقة الاختبار\"",
+                "payment-step3": "حدد \"حفظ بطاقتي\"",
+                "payment-step4": "قم بالدفع",
+                "payment-step6": "✅ حتى CVV مخزن!",
+                "payment-button": "اختبر الدفع ←",
+                "brute-title": "القوة الغاشمة CVV",
+                "brute-subtitle": "1000 محاولة CVV - بدون حد للمعدل!",
+                "brute-step1": "انتقل إلى صفحة الدفع",
+                "brute-step2": "قم بالتمرير لأسفل",
+                "brute-step3": "ابحث عن زر \"بدء القوة الغاشمة\"",
+                "brute-step4": "انقر وشاهد",
+                "brute-step5": "✅ تم العثور على CVV الصحيح في ثوانٍ!",
+                "brute-button": "القوة الغاشمة CVV ←",
+                "upload-title": "تجاوز تحميل الملفات",
+                "upload-subtitle": "تحميل ملفات عشوائية، RCE، اجتياز المسار",
+                "upload-step1": "انتقل إلى صفحة التحميل",
+                "upload-step2": "حدد أي ملف",
+                "upload-step3": "أعد تسمية الملف إلى",
+                "upload-step3b": "",
+                "upload-step4": "تحميل",
+                "upload-step5": "✅ نجح اجتياز المسار!",
+                "upload-button": "اختبر تحميل الملفات ←",
+                "footer-title": "🔓 تطبيق ضعيف عمداً لاختبار الأمان",
+                "footer-warning": "هذه المنصة لأغراض تعليمية. لا تدخل معلومات بطاقتك الحقيقية أو بياناتك الشخصية!"
+            }
+        };
+
+        function changeLanguage(lang) {
+            // Sayfadaki tüm data-i18n elementlerini bul ve çevir
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    // innerHTML kullan ki <br> tagları çalışsın
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+            
+            // Seçilen dili kaydet
+            localStorage.setItem('language', lang);
+            
+            // RTL desteği (Arapça için)
+            if (lang === 'ar') {
+                document.body.setAttribute('dir', 'rtl');
+            } else {
+                document.body.setAttribute('dir', 'ltr');
+            }
+            
+            // HTML lang attribute güncelle
+            document.documentElement.lang = lang;
+        }
+
+        // Sayfa yüklendiğinde kaydedilmiş dili uygula
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language') || 'tr';
+            document.getElementById('languageSelect').value = savedLang;
+            changeLanguage(savedLang);
+            
+            // Dil değişikliğini dinle
+            document.getElementById('languageSelect').addEventListener('change', (e) => {
+                changeLanguage(e.target.value);
+            });
+        });
     </script>
 </body>
 </html>
